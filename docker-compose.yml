@@ -1,0 +1,19 @@
+version: '3'
+services:
+  drone-management-system:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: drone-management-system:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+  postgres:
+   image: postgres:latest
+   ports:
+     - "5432:5432"
+   environment:
+     POSTGRES_DB: ${POSTGRES_DB:-drone}
+     POSTGRES_USER: ${POSTGRES_USER:-admin}
+     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}

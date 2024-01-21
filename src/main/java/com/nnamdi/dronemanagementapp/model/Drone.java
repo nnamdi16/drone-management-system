@@ -13,7 +13,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 @Table(name = "drones")
-public class Drones extends AbstractEntity implements Serializable {
+public class Drone extends AbstractEntity implements Serializable {
     @Column(name = "coordinateX")
     private int coordinateX;
 

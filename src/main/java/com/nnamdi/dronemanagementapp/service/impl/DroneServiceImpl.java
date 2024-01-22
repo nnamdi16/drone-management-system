@@ -43,8 +43,8 @@ public class DroneServiceImpl implements DroneService {
     }
 
     @Override
-    public DroneDto getDronePosition(String id) {
-        return null;
+    public Optional<Drone> getDronePosition(String id) {
+        return droneRepository.findById(id);
     }
 
 

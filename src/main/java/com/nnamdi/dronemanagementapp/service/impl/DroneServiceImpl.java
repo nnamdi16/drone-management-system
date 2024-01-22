@@ -27,7 +27,7 @@ public class DroneServiceImpl implements DroneService {
 
     @Override
     public DroneDto registerDrone(RegisterDroneDto droneDto) {
-        Optional<Drone> existingDrone = droneRepository.findByCoordinates(droneDto.getCoordinateX(), droneDto.getCoordinateY());
+        Optional<Drone> existingDrone = droneRepository.findByCoordinatesOrName(droneDto.getCoordinateX(), droneDto.getCoordinateY(), droneDto.getName());
         if (existingDrone.isPresent()) {
             throw new ModelAlreadyExistException(ConstantsUtil.ALREADY_EXIST);
         }

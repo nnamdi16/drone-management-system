@@ -12,18 +12,21 @@ import java.time.ZonedDateTime;
 
 public class TestMock {
     public static  final String ID = "8D19B947443D4C1BB2700337527BC251";
+    public static final String DRONE_NAME = "DRONE";
 
     public static RegisterDroneDto registerDroneDto() {
         return RegisterDroneDto.builder()
                 .direction(Direction.WEST)
                 .coordinateX(10)
                 .coordinateY(10)
+                .name(DRONE_NAME)
                 .build();
     }
 
     public static RegisterDroneDto registerDroneBadRequestDto() {
         return RegisterDroneDto.builder()
                 .direction(Direction.WEST)
+                .name(DRONE_NAME)
                 .coordinateX(-10)
                 .coordinateY(10)
                 .build();
@@ -35,6 +38,7 @@ public class TestMock {
                 .direction(Direction.WEST)
                 .coordinateX(10)
                 .coordinateY(10)
+                .name(DRONE_NAME)
                 .id(ID)
                 .build();
     }

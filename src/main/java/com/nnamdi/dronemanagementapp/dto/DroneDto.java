@@ -25,6 +25,8 @@ public class DroneDto implements Serializable {
     @JsonProperty("y-coordinate")
     private int coordinateY;
 
+    private String name;
+
     private Direction direction;
 
 }

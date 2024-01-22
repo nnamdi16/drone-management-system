@@ -54,7 +54,7 @@ class DroneServiceTest {
         RegisterDroneDto droneDto = registerDroneDto();
         Drone drone = buildDrone(droneDto);
         when(droneRepository.save(any(Drone.class))).thenReturn(drone);
-        when(droneRepository.findByCoordinates(droneDto.getCoordinateX(), droneDto.getCoordinateY())).thenReturn(Optional.empty());
+        when(droneRepository.findByCoordinatesOrName(droneDto.getCoordinateX(), droneDto.getCoordinateY(), droneDto.getName())).thenReturn(Optional.empty());
         when(droneUtil.convertDtoToEntity(droneDto)).thenReturn(drone);
         final var response  = droneService.registerDrone(droneDto);
         assertThat(response).isNotNull();
@@ -73,7 +73,7 @@ class DroneServiceTest {
         Drone drone = buildDrone(droneDto);
         when(droneUtil.convertDtoToEntity(droneDto)).thenReturn(drone);
 
-        when(droneRepository.findByCoordinates(droneDto.getCoordinateX(), droneDto.getCoordinateY())).thenReturn(Optional.of(drone));
+        when(droneRepository.findByCoordinatesOrName(droneDto.getCoordinateX(), droneDto.getCoordinateY(), droneDto.getName())).thenReturn(Optional.of(drone));
 
         assertThatThrownBy(() -> droneService.registerDrone(droneDto)).hasMessage("Entity already exist").isInstanceOf(ModelAlreadyExistException.class);
 

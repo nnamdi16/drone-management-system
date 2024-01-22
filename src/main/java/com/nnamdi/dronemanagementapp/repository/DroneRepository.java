@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface DroneRepository extends JpaRepository<Drone, String> {
 
-    @Query("SELECT d FROM Drone d WHERE d.coordinateX = :coordinateX AND d.coordinateY = :coordinateY")
-    Optional<Drone> findByCoordinates(@Param("coordinateX") int coordinateX, @Param("coordinateY")int coordinateY);
+    @Query("SELECT d FROM Drone d WHERE d.coordinateX = :coordinateX AND d.coordinateY = :coordinateY OR LOWER(d.name) = LOWER(:name)")
+    Optional<Drone> findByCoordinatesOrName(@Param("coordinateX") int coordinateX, @Param("coordinateY")int coordinateY, String name);
 }

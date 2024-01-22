@@ -31,4 +31,7 @@ public class RegisterDroneDto {
     @Enumerated(EnumType.STRING)
     private Direction direction;
 
+    @NotBlank(message = "name of drone must be provided")
+    private String name;
+
 }

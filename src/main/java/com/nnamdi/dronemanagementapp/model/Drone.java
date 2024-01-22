@@ -21,6 +21,9 @@ public class Drone extends AbstractEntity implements Serializable {
     @Column(name = "coordinateX")
     private int coordinateX;
 
+    @Column(name = "name", unique = true)
+    private String name;
+
     @Column(name = "coordinateY")
     private int coordinateY;
 

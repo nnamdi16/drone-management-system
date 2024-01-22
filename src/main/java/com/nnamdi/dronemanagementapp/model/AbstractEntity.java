@@ -27,17 +27,11 @@ public class AbstractEntity {
     @Column(name = "updated_date")
     private ZonedDateTime lastModifiedDate;
 
-    @LastModifiedBy
-    @Column(name = "updated_by", length = 40)
-    private String lastModifiedBy;
 
     @CreatedDate
     @Column(name = "created_date")
     private ZonedDateTime createdDate;
 
-    @CreatedBy
-    @Column(name = "created_by", nullable = false, length = 40)
-    private String createdBy;
 
     @PrePersist
     public void  abstractPrePersist() {

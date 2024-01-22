@@ -1,34 +1,51 @@
 package com.nnamdi.dronemanagementapp.service.impl;
 
-import com.nnamdi.dronemanagementapp.dto.Response;
+import com.nnamdi.dronemanagementapp.dto.DroneDto;
+import com.nnamdi.dronemanagementapp.exception.ModelAlreadyExistException;
 import com.nnamdi.dronemanagementapp.model.Drone;
-import com.nnamdi.dronemanagementapp.request.DroneDto;
+import com.nnamdi.dronemanagementapp.repository.DroneRepository;
+import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
 import com.nnamdi.dronemanagementapp.request.UpdateDroneDto;
 import com.nnamdi.dronemanagementapp.service.DroneService;
-import com.nnamdi.dronemanagementapp.util.ResponseUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import reactor.core.publisher.Mono;
+import com.nnamdi.dronemanagementapp.util.ConstantsUtil;
+import com.nnamdi.dronemanagementapp.util.DroneUtil;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+
+@Service
+@RequiredArgsConstructor
 public class DroneServiceImpl implements DroneService {
-    private final ResponseUtil responseUtil;
+    private final ModelMapper modelMapper;
+    private final DroneUtil droneUtil;
+    private final DroneRepository droneRepository;
 
-    @Autowired
-    public DroneServiceImpl(ResponseUtil responseUtil) {
-        this.responseUtil = responseUtil;
+
+
+    @Override
+    public DroneDto registerDrone(RegisterDroneDto droneDto) {
+        Optional<Drone> existingDrone = droneRepository.findByCoordinates(droneDto.getCoordinateX(), droneDto.getCoordinateY());
+        if (existingDrone.isPresent()) {
+            throw new ModelAlreadyExistException(ConstantsUtil.ALREADY_EXIST);
+        }
+        Drone drone = droneUtil.convertDtoToEntity(droneDto);
+        final var registeredDrone = droneRepository.save(drone);
+        return modelMapper.map(registeredDrone, DroneDto.class);
+
     }
 
     @Override
-    public Mono<Response> registerDrone(DroneDto drone) {
+    public DroneDto moveDrone(String id, UpdateDroneDto updateDroneDto) {
         return null;
     }
 
     @Override
-    public Mono<Drone> moveDrone(String id, UpdateDroneDto updateDroneDto) {
+    public DroneDto getDronePosition(String id) {
         return null;
     }
 
-    @Override
-    public Mono<Drone> getDronePosition(String id) {
-        return null;
-    }
+
 }

@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.nnamdi.dronemanagementapp.dto.DroneDto;
 import com.nnamdi.dronemanagementapp.exception.ModelAlreadyExistException;
 import com.nnamdi.dronemanagementapp.mock.TestMock;
+import com.nnamdi.dronemanagementapp.model.Drone;
 import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
 import com.nnamdi.dronemanagementapp.service.DroneService;
 import com.nnamdi.dronemanagementapp.util.ConstantsUtil;
@@ -22,10 +23,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Optional;
+
 import static com.nnamdi.dronemanagementapp.controller.BaseApiController.BASE_API_PATH;
 import static com.nnamdi.dronemanagementapp.controller.BaseApiController.DRONE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -111,6 +115,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                                     .content(registerDroneRequest)
                     )
                     .andExpect(status().isConflict())
+                    .andDo(print());
+        }catch (Exception e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void getDronePosition() {
+        Optional<Drone> droneDto = droneService.getDronePosition(TestMock.ID);
+        when(responseUtil.getSuccessResponse(droneDto)).thenReturn(TestMock.buildResponse(TestMock.buildDrone(TestMock.registerDroneDto())));
+        try {
+            mockMvc.perform(
+                            get(URL + "/" + TestMock.ID)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
                     .andDo(print());
         }catch (Exception e) {
             throw  new RuntimeException(e);

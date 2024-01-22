@@ -28,4 +28,11 @@ public class DroneController {
         Response  response =  responseUtil.getSuccessResponse(droneService.registerDrone(requestDto));
         return ResponseEntity.ok(response);
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{droneId}")
+    public ResponseEntity<Response> getDrone(@PathVariable("droneId") String droneId) {
+        Response  response =  responseUtil.getSuccessResponse(droneService.getDronePosition(droneId));
+        return ResponseEntity.ok(response);
+    }
 }

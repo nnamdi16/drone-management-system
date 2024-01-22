@@ -1,0 +1,121 @@
+package com.nnamdi.dronemanagementapp.controller;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.nnamdi.dronemanagementapp.dto.DroneDto;
+import com.nnamdi.dronemanagementapp.exception.ModelAlreadyExistException;
+import com.nnamdi.dronemanagementapp.mock.TestMock;
+import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
+import com.nnamdi.dronemanagementapp.service.DroneService;
+import com.nnamdi.dronemanagementapp.util.ConstantsUtil;
+import com.nnamdi.dronemanagementapp.util.ResponseUtil;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static com.nnamdi.dronemanagementapp.controller.BaseApiController.BASE_API_PATH;
+import static com.nnamdi.dronemanagementapp.controller.BaseApiController.DRONE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
+@ExtendWith(SpringExtension.class)
+@WebMvcTest(controllers = DroneController.class)
+ class DroneControllerTest {
+    @Autowired
+    MockMvc mockMvc;
+
+    @MockBean
+    DroneService droneService;
+
+    @MockBean
+    ResponseUtil responseUtil;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    Gson gson;
+
+    String registerDroneRequest;
+
+    private final String URL = BASE_API_PATH + DRONE ;
+
+    @BeforeEach
+    void setup() throws JsonProcessingException {
+        registerDroneRequest = objectMapper.writeValueAsString(TestMock.registerDroneDto());
+
+    }
+
+    @AfterEach
+    void tearDown() {
+        Mockito.reset(droneService);
+    }
+
+    @Test
+    void registerDrone() {
+        DroneDto droneDto = droneService.registerDrone(any(RegisterDroneDto.class));
+        when(droneDto).thenReturn(TestMock.buildDroneDto());
+        when(responseUtil.getSuccessResponse(droneDto)).thenReturn(TestMock.buildResponse(TestMock.buildDroneDto()));
+        try {
+            mockMvc.perform(
+                            post(URL)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(registerDroneRequest)
+                    )
+                    .andExpect(status().isOk())
+                    .andDo(print());
+        }catch (Exception e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void registerDroneBadRequest() throws JsonProcessingException {
+       registerDroneRequest = objectMapper.writeValueAsString(TestMock.registerDroneBadRequestDto());
+        try {
+            mockMvc.perform(
+                            post(URL)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(registerDroneRequest)
+                    )
+                    .andExpect(status().isBadRequest())
+                    .andDo(print());
+        }catch (Exception e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+
+    @Test
+    void registerDroneThrowsAlreadyExist() throws JsonProcessingException {
+        registerDroneRequest = objectMapper.writeValueAsString(TestMock.registerDroneDto());
+        DroneDto droneDto = droneService.registerDrone(any(RegisterDroneDto.class));
+        when(droneDto).thenThrow(new ModelAlreadyExistException(ConstantsUtil.ALREADY_EXIST));
+        try {
+            mockMvc.perform(
+                            post(URL)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(registerDroneRequest)
+                    )
+                    .andExpect(status().isConflict())
+                    .andDo(print());
+        }catch (Exception e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+
+}

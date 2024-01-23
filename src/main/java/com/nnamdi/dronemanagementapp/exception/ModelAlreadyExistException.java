@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @EqualsAndHashCode(callSuper = false)
 @ResponseStatus(value = HttpStatus.CONFLICT)
 public class ModelAlreadyExistException extends RuntimeException {
-    public ModelAlreadyExistException(String message){
+    public ModelAlreadyExistException(String message) {
         super(message);
     }
 

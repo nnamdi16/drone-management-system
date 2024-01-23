@@ -17,7 +17,14 @@ public class DroneUtil {
         this.modelMapper = modelMapper;
     }
 
-    public Drone convertDtoToEntity(RegisterDroneDto droneDto) {
+    public Drone buildDroneEntity(RegisterDroneDto droneDto) {
         return   modelMapper.map(droneDto, Drone.class);
+    }
+
+    public boolean isValidDirectionChange(Direction currentDirection, Direction updatedDirection) {
+        return switch (currentDirection) {
+            case NORTH, SOUTH -> updatedDirection == Direction.EAST || updatedDirection == Direction.WEST;
+            case EAST, WEST -> updatedDirection == Direction.NORTH || updatedDirection == Direction.SOUTH;
+        };
     }
 }

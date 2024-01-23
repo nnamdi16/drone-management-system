@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @EqualsAndHashCode(callSuper = false)
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 @Data
-public class BadRequestException extends RuntimeException{
+public class BadRequestException extends RuntimeException {
     public BadRequestException(String message) {
         super(message);
     }

@@ -6,18 +6,19 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterDroneDto {
+public class UpdateDronePositionDto implements Serializable {
     @NotNull(message = "x-coordinate must be provided")
     @JsonProperty("x-coordinate")
     @Max(value = 9, message = "x co-ordinate field boundary must not exceed 10")
@@ -33,8 +34,4 @@ public class RegisterDroneDto {
     @NotNull(message = "direction must be provided")
     @Enumerated(EnumType.STRING)
     private Direction direction;
-
-    @NotBlank(message = "name of drone must be provided")
-    private String name;
-
 }

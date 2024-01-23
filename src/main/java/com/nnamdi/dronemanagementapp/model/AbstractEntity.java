@@ -2,11 +2,12 @@ package com.nnamdi.dronemanagementapp.model;
 
 import com.nnamdi.dronemanagementapp.util.AppUtil;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.ZonedDateTime;
@@ -34,7 +35,7 @@ public class AbstractEntity {
 
 
     @PrePersist
-    public void  abstractPrePersist() {
+    public void abstractPrePersist() {
         log.debug("about to run abstractPrePersist method");
         createdDate = ZonedDateTime.now();
         lastModifiedDate = ZonedDateTime.now();

@@ -2,6 +2,7 @@ package com.nnamdi.dronemanagementapp.controller;
 
 import com.nnamdi.dronemanagementapp.dto.Response;
 import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
+import com.nnamdi.dronemanagementapp.request.UpdateDronePositionDto;
 import com.nnamdi.dronemanagementapp.service.DroneService;
 import com.nnamdi.dronemanagementapp.util.ResponseUtil;
 import jakarta.validation.Valid;
@@ -25,14 +26,28 @@ public class DroneController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ResponseEntity<Response> registerDrone(@RequestBody @Valid RegisterDroneDto requestDto) {
-        Response  response =  responseUtil.getSuccessResponse(droneService.registerDrone(requestDto));
+        Response response = responseUtil.getSuccessResponse(droneService.registerDrone(requestDto));
         return ResponseEntity.ok(response);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{droneId}")
     public ResponseEntity<Response> getDrone(@PathVariable("droneId") String droneId) {
-        Response  response =  responseUtil.getSuccessResponse(droneService.getDronePosition(droneId));
+        Response response = responseUtil.getSuccessResponse(droneService.getDronePosition(droneId));
+        return ResponseEntity.ok(response);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{droneId}")
+    public ResponseEntity<Response> getDrone(@PathVariable("droneId") String droneId, @RequestBody @Valid UpdateDronePositionDto updateDronePositionDto) {
+        Response response = responseUtil.getSuccessResponse(droneService.moveDrone(droneId, updateDronePositionDto));
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Response> getDrones(@RequestParam(value = "page", required = false, defaultValue = "1") int page, @RequestParam(value = "limit", required = false, defaultValue = "50") int limit) {
+        Response response = responseUtil.getSuccessResponse(droneService.getDrones(page, limit));
         return ResponseEntity.ok(response);
     }
 }

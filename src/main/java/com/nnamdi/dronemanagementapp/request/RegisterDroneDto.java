@@ -17,12 +17,12 @@ import lombok.NoArgsConstructor;
 public class RegisterDroneDto {
     @NotNull(message = "x-coordinate must be provided")
     @JsonProperty("x-coordinate")
-    @Max(value = 10, message = "x co-ordinate field boundary must not exceed 10")
+    @Max(value = 9, message = "x co-ordinate field boundary must not exceed 10")
     @Min(value = 0, message = "x co-ordinate field boundary must not be below 0")
     private int coordinateX;
 
     @NotNull(message = "y-coordinate must be provided")
-    @Max(value = 10, message = "y co-ordinate field boundary must not exceed 10")
+    @Max(value = 9, message = "y co-ordinate field boundary must not exceed 10")
     @Min(value = 0, message = "y co-ordinate field boundary must not be below 0")
     @JsonProperty("y-coordinate")
     private int coordinateY;

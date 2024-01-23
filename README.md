@@ -69,6 +69,15 @@ To run the test for the spring boot application, run the command below:
 mvn clean test
 ```
 
+To generate test coverage report for the spring boot application, run the command below:
+
+```bash
+cd drone-management-app
+mvn jacoco:report
+```
+
+To view the report you need to run the report which is an index.html file in the target/site/jacoco folder in a browser.
+
 
 ## Documentation
 The REST endpoints for the drone-management-app are documented using swagger.

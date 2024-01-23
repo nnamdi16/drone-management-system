@@ -108,7 +108,6 @@
 					<includes>
 						<include>com/nnamdi/dronemanagementapp/controller/**</include>
 						<include>com/nnamdi/dronemanagementapp/service/**</include>
-						<include>com/nnamdi/dronemanagementapp/util/**</include>
 					</includes>
 				</configuration>
 				<executions>

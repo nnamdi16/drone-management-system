@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.nnamdi.dronemanagementapp.dto.DroneDto;
+import com.nnamdi.dronemanagementapp.exception.BadRequestException;
 import com.nnamdi.dronemanagementapp.exception.ModelAlreadyExistException;
+import com.nnamdi.dronemanagementapp.exception.NotFoundException;
 import com.nnamdi.dronemanagementapp.mock.TestMock;
 import com.nnamdi.dronemanagementapp.model.Drone;
 import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
+import com.nnamdi.dronemanagementapp.request.UpdateDronePositionDto;
 import com.nnamdi.dronemanagementapp.service.DroneService;
 import com.nnamdi.dronemanagementapp.util.ConstantsUtil;
 import com.nnamdi.dronemanagementapp.util.ResponseUtil;
@@ -28,9 +31,9 @@ import java.util.Optional;
 import static com.nnamdi.dronemanagementapp.controller.BaseApiController.BASE_API_PATH;
 import static com.nnamdi.dronemanagementapp.controller.BaseApiController.DRONE;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,12 +58,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     String registerDroneRequest;
 
+    String updateDroneRequest;
+
     private final String URL = BASE_API_PATH + DRONE ;
 
     @BeforeEach
     void setup() throws JsonProcessingException {
         registerDroneRequest = objectMapper.writeValueAsString(TestMock.registerDroneDto());
-
+        updateDroneRequest = objectMapper.writeValueAsString(TestMock.updateDronePositionDto());
     }
 
     @AfterEach
@@ -131,6 +136,65 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                                     .accept(MediaType.APPLICATION_JSON)
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
+                    .andDo(print());
+        }catch (Exception e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+
+    @Test
+    void moveDrone() {
+        DroneDto droneDto = droneService.moveDrone(anyString(),any(UpdateDronePositionDto.class));
+        UpdateDronePositionDto updateDronePositionDto = TestMock.updateDronePositionDto();
+        when(droneDto).thenReturn(TestMock.buildDroneDto(updateDronePositionDto));
+        when(responseUtil.getSuccessResponse(droneDto)).thenReturn(TestMock.buildResponse(TestMock.buildDroneDto()));
+        try {
+            mockMvc.perform(
+                            put(URL + "/" + TestMock.ID)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(updateDroneRequest)
+                    )
+                    .andExpect(status().isOk())
+                    .andDo(print());
+        }catch (Exception e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void moveDroneNotFoundException() {
+        DroneDto droneDto = droneService.moveDrone(anyString(),any(UpdateDronePositionDto.class));
+        when(droneDto).thenThrow(new NotFoundException(ConstantsUtil.NOT_FOUND));
+        try {
+            mockMvc.perform(
+                            put(URL + "/" + TestMock.ID)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(updateDroneRequest)
+                    )
+                    .andExpect(status().isNotFound())
+                    .andDo(print());
+        }catch (Exception e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+
+
+    @Test
+    void moveDroneBadRequest() {
+        DroneDto droneDto = droneService.moveDrone(anyString(),any(UpdateDronePositionDto.class));
+        RegisterDroneDto registerDroneDto = TestMock.registerDroneDto();
+        Drone drone = TestMock.buildDrone(registerDroneDto);
+        UpdateDronePositionDto updateDronePositionDto = TestMock.updateDronePositionDto();
+        when(droneDto).thenThrow(new BadRequestException("Invalid direction from " + drone.getDirection() + " to " + updateDronePositionDto.getDirection()));
+        try {
+            mockMvc.perform(
+                            put(URL + "/" + TestMock.ID)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(updateDroneRequest)
+                    )
+                    .andExpect(status().isBadRequest())
                     .andDo(print());
         }catch (Exception e) {
             throw  new RuntimeException(e);

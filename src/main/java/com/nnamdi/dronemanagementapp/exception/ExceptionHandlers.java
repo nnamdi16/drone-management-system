@@ -35,9 +35,7 @@ public class ExceptionHandlers {
     @ResponseBody
     public ResponseEntity<Response> handleBadRequest(final MethodArgumentNotValidException ex) {
         BindingResult result = ex.getBindingResult();
-        List<String> validationErrors = result.getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .toList();
+        List<String> validationErrors = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
         String customErrorMessage = "Validation failed. Please check your input.";
         String errorMessage = customErrorMessage + " " + String.join(", ", validationErrors);
 
@@ -56,7 +54,7 @@ public class ExceptionHandlers {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResponseEntity<Response> handleBadRequest(final BadRequestException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseUtil.getErrorResponse(new Error(ResponseCodes.NOT_FOUND, ConstantsUtil.NOT_FOUND, ex.getMessage())));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseUtil.getErrorResponse(new Error(ResponseCodes.INVALID_REQUEST, ConstantsUtil.BAD_REQUEST, ex.getMessage())));
     }
 
 

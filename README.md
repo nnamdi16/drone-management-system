@@ -8,7 +8,7 @@ Welcome to the Drone Management System!. Drone management system is a Spring Boo
 * API Endpoints
 * Running Test
 * Swagger Documentation
-* Assumptions
+
 
 
 
@@ -111,8 +111,5 @@ The REST endpoints for the drone-management-app are documented using swagger.
 The swagger documentation UI is seen below:
 - [Drone Management App](http://localhost:8080/swagger-ui/index.html)
 
-
-## Assumptions
-- The drone cannot move from to the same current position i.e from North to North or South to South 
 
 

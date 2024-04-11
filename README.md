@@ -104,7 +104,7 @@ mvn jacoco:report
 ```
 
 To view the report, you need to run the report, which is an index.html file in the target/site/jacoco folder in a browser.
-
+[pom.xml](pom.xml)
 
 ## Documentation
 The REST endpoints for the drone-management-app are documented using swagger.

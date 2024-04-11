@@ -50,8 +50,6 @@ class DroneControllerTest {
     ResponseUtil responseUtil;
     @Autowired
     ObjectMapper objectMapper;
-    @Autowired
-    Gson gson;
     String registerDroneRequest;
     String updateDroneRequest;
 

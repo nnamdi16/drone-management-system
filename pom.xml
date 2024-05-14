@@ -147,6 +147,35 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <from>
+                        <image>openjdk:17</image>
+                        <platforms>
+                            <platform>
+                                <architecture>amd64</architecture>
+                                <os>linux</os>
+                            </platform>
+                        </platforms>
+                    </from>
+                    <to>
+                        <image>drone-management-system</image>
+                    </to>
+                    <container>
+                        <mainClass>com.nnamdi.dronemanagementapp.DroneManagementAppApplication</mainClass>
+
+                        <ports>
+                            <port>8080</port>
+                            <port>7800</port>
+                        </ports>
+
+
+                    </container>
+                </configuration>
+            </plugin>
 
 		</plugins>
     </build>

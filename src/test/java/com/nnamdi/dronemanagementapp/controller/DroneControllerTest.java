@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.nnamdi.dronemanagementapp.dto.DroneDto;
+import com.nnamdi.dronemanagementapp.dto.Response;
 import com.nnamdi.dronemanagementapp.exception.BadRequestException;
 import com.nnamdi.dronemanagementapp.exception.ModelAlreadyExistException;
 import com.nnamdi.dronemanagementapp.exception.NotFoundException;
@@ -22,11 +23,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Optional;
 
 import static com.nnamdi.dronemanagementapp.controller.BaseApiController.BASE_API_PATH;
 import static com.nnamdi.dronemanagementapp.controller.BaseApiController.DRONE;
@@ -103,8 +103,9 @@ class DroneControllerTest {
 
     @Test
     void getDronePosition() {
-        Optional<Drone> droneDto = droneService.getDronePosition(TestMock.ID);
-        when(responseUtil.getSuccessResponse(droneDto)).thenReturn(TestMock.buildResponse(TestMock.buildDrone(TestMock.registerDroneDto())));
+        DroneDto droneDto = droneService.getDronePosition(TestMock.ID);
+        Response<DroneDto> response = TestMock.buildResponse(TestMock.buildDroneDto());
+        when(responseUtil.getSuccessResponse(droneDto)).thenReturn(response);
         try {
             mockMvc.perform(get(URL + "/" + TestMock.ID).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(print());
         } catch (Exception e) {
@@ -113,9 +114,10 @@ class DroneControllerTest {
     }
 
     @Test
-    void getDronePositions() {
-        Optional<Drone> droneDto = droneService.getDronePosition(TestMock.ID);
-        when(responseUtil.getSuccessResponse(droneDto)).thenReturn(TestMock.buildResponse(TestMock.buildDrone(TestMock.registerDroneDto())));
+    void getDrones() {
+        PageImpl<DroneDto> drones = droneService.getDrones(1, 50);
+        Response<PageImpl<DroneDto>> response = TestMock.buildResponse(TestMock.buildDroneDtoList(1, 50));
+        when(responseUtil.getSuccessResponse(drones)).thenReturn(response);
         try {
             mockMvc.perform(get(URL).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).param("page", "1").param("limit", "50")
 

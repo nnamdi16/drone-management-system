@@ -1,4 +1,4 @@
 package com.nnamdi.dronemanagementapp.dto;
 
-public record Response(Integer code, String message, Object data, String descriptiveMessage) {
+public record Response<T>(Integer code, String message, T data, String descriptiveMessage) {
 }

@@ -8,8 +8,11 @@ import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
 import com.nnamdi.dronemanagementapp.request.UpdateDronePositionDto;
 import com.nnamdi.dronemanagementapp.util.ConstantsUtil;
 import com.nnamdi.dronemanagementapp.util.Direction;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 public class TestMock {
     public static final String ID = "8D19B947443D4C1BB2700337527BC251";
@@ -33,6 +36,13 @@ public class TestMock {
         return DroneDto.builder().direction(updateDronePositionDto.getDirection()).coordinateX(updateDronePositionDto.getCoordinateX()).coordinateY(updateDronePositionDto.getCoordinateY()).name(DRONE_NAME).id(ID).build();
     }
 
+    public static PageImpl<DroneDto> buildDroneDtoList(int page, int limit) {
+        PageRequest pageRequest = PageRequest.of(page, limit);
+        DroneDto droneDto = DroneDto.builder().direction(Direction.WEST).coordinateX(10).coordinateY(10).name(DRONE_NAME).id(ID).build();
+        List<DroneDto> droneDtoList = List.of(droneDto);
+        return  new PageImpl<>(droneDtoList, pageRequest, 1);
+    }
+
 
     public static Drone buildDrone(RegisterDroneDto droneDto) {
         Drone drone = Drone.builder().direction(droneDto.getDirection()).coordinateX(droneDto.getCoordinateX()).coordinateY(droneDto.getCoordinateY()).build();
@@ -52,8 +62,8 @@ public class TestMock {
         return drone;
     }
 
-    public static Response buildResponse(Object data) {
-        return new Response(ResponseCodes.SUCCESS.code(), ConstantsUtil.SUCCESSFUL, data, null);
+    public static <T> Response<T> buildResponse(T data) {
+        return new Response<>(ResponseCodes.SUCCESS.code(), ConstantsUtil.SUCCESSFUL, data, null);
     }
 
 

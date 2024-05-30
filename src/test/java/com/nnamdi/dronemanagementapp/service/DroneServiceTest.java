@@ -10,6 +10,7 @@ import com.nnamdi.dronemanagementapp.repository.DroneRepository;
 import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
 import com.nnamdi.dronemanagementapp.request.UpdateDronePositionDto;
 import com.nnamdi.dronemanagementapp.service.impl.DroneServiceImpl;
+import com.nnamdi.dronemanagementapp.service.impl.ExternalApiService;
 import com.nnamdi.dronemanagementapp.util.Direction;
 import com.nnamdi.dronemanagementapp.util.DroneUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,8 @@ class DroneServiceTest {
     private ModelMapper modelMapper;
     @Mock
     private DroneUtil droneUtil;
+    @Mock
+    private ExternalApiService externalApiService;
 
 
     @BeforeEach
@@ -56,7 +59,7 @@ class DroneServiceTest {
         MockitoAnnotations.openMocks(this);
         modelMapper = new ModelMapper();
         messageProvider = new MessageProvider(messageSource);
-        droneService = new DroneServiceImpl(modelMapper, droneUtil, droneRepository, messageProvider);
+        droneService = new DroneServiceImpl(modelMapper, droneUtil, droneRepository, messageProvider, externalApiService);
     }
 
     @Test
@@ -92,7 +95,7 @@ class DroneServiceTest {
         Drone drone = buildDrone(droneDto);
         when(droneRepository.findById(ID)).thenReturn(Optional.of(drone));
         final var response = droneService.getDronePosition(ID);
-        assertThat(response).isNotEmpty();
+        assertThat(response).isNotNull();
     }
 
     @Test
@@ -114,7 +117,7 @@ class DroneServiceTest {
     void getDronePositionWithInvalidID() {
         when(droneRepository.findById(anyString())).thenReturn(Optional.empty());
         final var response = droneService.getDronePosition(anyString());
-        assertThat(response).isEmpty();
+        assertThat(response).isNotNull();
     }
 
     @Test

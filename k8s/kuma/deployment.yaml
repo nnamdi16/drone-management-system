@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: kuma-app
+  name: drone-mg
+data:
+  postgres_host: postgres
+  postgres_port: "5432"
+  postgres_database: test_db
+  postgres_user: hello
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: kuma-app
+  name: drone-mg
+stringData:
+  postgres_password: topsecret
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: kuma-app
+  name: drone-management-system-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            path: /drone-system-kuma(/|$)(.*)
+            backend:
+              service:
+                name: drone-management-system
+                port:
+                  number: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kuma-app
+  name: drone-management-system
+  labels:
+    app: drone-management-system
+spec:
+  ports:
+    - port: 8080
+      name: http
+  type: ClusterIP
+  selector:
+    app: drone-management-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: kuma-app
+  name: drone-management-system
+spec:
+  selector:
+    matchLabels:
+      app: drone-management-system
+  template:
+    metadata:
+      namespace: kuma-app
+      labels:
+        app: drone-management-system
+    spec:
+      containers:
+        - name: drone-management-system
+          image: drone-management-system:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kuma-app
+  name: db
+  labels:
+    name: postgres-service
+    app: drone-management-system
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    name: postgres-pod
+    app: drone-management-system
+

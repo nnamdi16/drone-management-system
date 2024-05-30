@@ -1,12 +1,9 @@
 package com.nnamdi.dronemanagementapp.service;
 
 import com.nnamdi.dronemanagementapp.dto.DroneDto;
-import com.nnamdi.dronemanagementapp.model.Drone;
 import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
 import com.nnamdi.dronemanagementapp.request.UpdateDronePositionDto;
-import org.springframework.data.domain.Page;
-
-import java.util.Optional;
+import org.springframework.data.domain.PageImpl;
 
 
 /**
@@ -17,7 +14,7 @@ public interface DroneService {
 
     DroneDto moveDrone(String id, UpdateDronePositionDto updateDroneDto);
 
-    Optional<Drone> getDronePosition(String id);
+    DroneDto getDronePosition(String id);
 
-    Page<DroneDto> getDrones(int page, int limit);
+    PageImpl<DroneDto> getDrones(int page, int limit);
 }

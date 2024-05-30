@@ -33,7 +33,7 @@ public class ExceptionHandlers {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResponseEntity<Response> handleBadRequest(final MethodArgumentNotValidException ex) {
+    public <T>ResponseEntity<Response<T>> handleBadRequest(final MethodArgumentNotValidException ex) {
         BindingResult result = ex.getBindingResult();
         List<String> validationErrors = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
         String customErrorMessage = "Validation failed. Please check your input.";
@@ -45,7 +45,7 @@ public class ExceptionHandlers {
     @ExceptionHandler(ModelAlreadyExistException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
-    public ResponseEntity<Response> handleMethodAlreadyExist(final ModelAlreadyExistException ex) {
+    public <T>ResponseEntity<Response<T>> handleMethodAlreadyExist(final ModelAlreadyExistException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(responseUtil.getErrorResponse(new Error(ResponseCodes.INVALID_REQUEST, ConstantsUtil.ALREADY_EXIST, ex.getMessage())));
     }
 
@@ -53,7 +53,7 @@ public class ExceptionHandlers {
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResponseEntity<Response> handleBadRequest(final BadRequestException ex) {
+    public <T>ResponseEntity<Response<T>> handleBadRequest(final BadRequestException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseUtil.getErrorResponse(new Error(ResponseCodes.INVALID_REQUEST, ConstantsUtil.BAD_REQUEST, ex.getMessage())));
     }
 
@@ -61,7 +61,7 @@ public class ExceptionHandlers {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ResponseEntity<Response> handleNotFound(final NotFoundException ex) {
+    public <T>ResponseEntity<Response<T>> handleNotFound(final NotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseUtil.getErrorResponse(new Error(ResponseCodes.NOT_FOUND, ConstantsUtil.NOT_FOUND, ex.getMessage())));
     }
 }

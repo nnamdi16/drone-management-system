@@ -33,6 +33,7 @@ public class DroneServiceImpl implements DroneService {
     private final DroneUtil droneUtil;
     private final DroneRepository droneRepository;
     private final MessageProvider messageProvider;
+    private final ExternalApiService apiService;
 
 
     @Override
@@ -70,18 +71,24 @@ public class DroneServiceImpl implements DroneService {
     }
 
     @Override
-    public Optional<Drone> getDronePosition(String id) {
-        return droneRepository.findById(id);
+    public DroneDto getDronePosition(String id) {
+        Optional<Drone> optionalDrone = droneRepository.findById(id);
+        if (optionalDrone.isPresent()) {
+            return modelMapper.map(optionalDrone.get(), DroneDto.class);
+        } else {
+            throw  new NotFoundException(messageProvider.getDroneNotFound(id));
+        }
     }
 
     @Override
-    public Page<DroneDto> getDrones(int page, int limit) {
+    public PageImpl<DroneDto> getDrones(int page, int limit) {
         log.info("about to retrieve all notes by pagination {}, {}", page, limit);
         AppUtil.validatePageRequest(page, limit);
         Pageable pageable = PageRequest.of(page - 1, limit);
-        Page<Drone> drones = droneRepository.findAll(pageable);
-        List<DroneDto> notesDtoList = drones.getContent().stream().map(note -> modelMapper.map(note, DroneDto.class)).toList();
-        return new PageImpl<>(notesDtoList, drones.getPageable(), drones.getTotalElements());
+//        Page<Drone> drones = droneRepository.findAll(pageable);
+       return apiService.getDrones(page, limit);
+//        List<DroneDto> notesDtoList = drones.getContent().stream().map(note -> modelMapper.map(note, DroneDto.class)).toList();
+//        return new PageImpl<>(droneDto, drones.getPageable(), drones.getTotalElements());
     }
 
 

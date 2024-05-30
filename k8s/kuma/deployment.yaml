@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  namespace: kuma-app
   name: drone-mg
 data:
   postgres_host: postgres
@@ -11,6 +12,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
+  namespace: kuma-app
   name: drone-mg
 stringData:
   postgres_password: topsecret
@@ -18,6 +20,7 @@ stringData:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  namespace: kuma-app
   name: drone-management-system-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
@@ -26,7 +29,7 @@ spec:
     - http:
         paths:
           - pathType: Prefix
-            path: /drone-management-system(/|$)(.*)
+            path: /drone-system-kuma(/|$)(.*)
             backend:
               service:
                 name: drone-management-system
@@ -36,6 +39,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: kuma-app
   name: drone-management-system
   labels:
     app: drone-management-system
@@ -50,6 +54,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: kuma-app
   name: drone-management-system
 spec:
   selector:
@@ -57,6 +62,7 @@ spec:
       app: drone-management-system
   template:
     metadata:
+      namespace: kuma-app
       labels:
         app: drone-management-system
     spec:
@@ -66,62 +72,12 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: postgres-deploy
-  labels:
-    name: postgres-deploy
-    app: drone-management-system
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      name: postgres-pod
-      app: drone-management-system
-  template:
-    metadata:
-      name: postgres-pod
-      labels:
-        name: postgres-pod
-        app: drone-management-system
-    spec:
-      containers:
-        - name: postgres
-          image: postgres
-          ports:
-            - containerPort: 5432
-          env:
-            - name: POSTGRES_USER
-              valueFrom:
-                configMapKeyRef:
-                  name: drone-mg
-                  key: postgres_user
-            - name: POSTGRES_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: drone-mg
-                  key: postgres_host
-            - name: POSTGRES_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: drone-mg
-                  key: postgres_port
-            - name: POSTGRES_DATABASE
-              valueFrom:
-                configMapKeyRef:
-                  name: drone-mg
-                  key: postgres_database
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: drone-mg
-                  key: postgres_password
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: kuma-app
   name: db
   labels:
     name: postgres-service

@@ -57,6 +57,7 @@ metadata:
   namespace: kuma-app
   name: drone-management-system
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: drone-management-system
@@ -65,6 +66,8 @@ spec:
       namespace: kuma-app
       labels:
         app: drone-management-system
+      annotations:
+        sidecar.istio.io/inject: "true"
     spec:
       containers:
         - name: drone-management-system

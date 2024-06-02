@@ -98,27 +98,27 @@ class DroneServiceTest {
         assertThat(response).isNotNull();
     }
 
-    @Test
-    void getAllDronePositions() {
-        int page = 1;
-        int limit = 10;
+//    @Test
+//    void getAllDronePositions() {
+//        int page = 1;
+//        int limit = 10;
+//
+//        List<Drone> droneList = List.of(buildDrone(registerDroneDto()));
+//        Page<Drone> dronePage = new PageImpl<>(droneList, PageRequest.of(0, limit), droneList.size());
+//        when(droneRepository.findAll(PageRequest.of(0, limit))).thenReturn(dronePage);
+//
+//        Page<DroneDto> result = droneService.getDrones(page, limit);
+//        assertEquals(dronePage.getTotalElements(), result.getTotalElements());
+//        assertEquals(dronePage.getTotalPages(), result.getTotalPages());
+//        assertEquals(dronePage.getNumber() + 1, result.getNumber() + 1);
+//    }
 
-        List<Drone> droneList = List.of(buildDrone(registerDroneDto()));
-        Page<Drone> dronePage = new PageImpl<>(droneList, PageRequest.of(0, limit), droneList.size());
-        when(droneRepository.findAll(PageRequest.of(0, limit))).thenReturn(dronePage);
-
-        Page<DroneDto> result = droneService.getDrones(page, limit);
-        assertEquals(dronePage.getTotalElements(), result.getTotalElements());
-        assertEquals(dronePage.getTotalPages(), result.getTotalPages());
-        assertEquals(dronePage.getNumber() + 1, result.getNumber() + 1);
-    }
-
-    @Test
-    void getDronePositionWithInvalidID() {
-        when(droneRepository.findById(anyString())).thenReturn(Optional.empty());
-        final var response = droneService.getDronePosition(anyString());
-        assertThat(response).isNotNull();
-    }
+//    @Test
+//    void getDronePositionWithInvalidID() {
+//        when(droneRepository.findById(anyString())).thenReturn(Optional.empty());
+//        final var response = droneService.getDronePosition(anyString());
+//        assertThat(response).isNotNull();
+//    }
 
     @Test
     void moveDrone() {

@@ -10,8 +10,6 @@ Welcome to the Drone Management System!. Drone management system is a Spring Boo
 * Swagger Documentation
 
 
-
-
 ## Getting Started
 
 ### Prerequisite
@@ -19,7 +17,64 @@ Welcome to the Drone Management System!. Drone management system is a Spring Boo
 - Apache Maven 3.6.0 or higher
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/download/?section=mac) with the Spring Boot plugin or any other suitable IDE that can run spring boot.
 - [Docker](https://docs.docker.com/get-docker/) or you can set up your [postgres](https://www.postgresql.org/docs/current/tutorial-install.html) database locally.
+- kubectl - (CLI  for accessing Kubernetes)
 
+```bash 
+ brew install kind
+ brew install kubectl
+ ```
+- Ensure your Kind cluster is running:
+```bash
+kind get clusters
+```
+
+
+- If your cluster is not listed, you need to create or start it:
+```bash
+kind create clusters
+```
+
+- Check the current context and ensure it is set to the Kind cluster:
+```bash
+kubectl config current-context
+```
+
+The output should include a context related to Kind(e.g., `kind-kind`)
+
+If necessary, switch to the correct context:
+
+```bash
+kubectl config use-context kind-kind
+```
+
+- Deploy the Kubernetes Dashboard
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.1/aio/deploy/recommended.yaml
+```
+
+- Create a Service Account for Dashboard access
+```bash
+kubectl -n kubernetes-dashboard create token dashboard-admin-sa
+kubectl create clusterrolebinding admin-user-binding --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:admin-user
+```
+
+```bash
+kubectl create ns istio
+
+kubectl apply -f k8s/skaffold/postgres.yaml
+```
+[deployment.yaml](k8s%2Fskaffold%2Fdeployment.yaml)
+Start the `kubectl` Proxy
+Run `kubectl` proxy to access the dashboard:
+
+```bash
+kubectl proxy --port=8001
+```
+
+#### Access the Dashboard
+```bash
+http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+```
 
 
 ### Running the application
@@ -44,18 +99,13 @@ spring.datasource.password=postgres
 - Build the application using maven.
 
  ```bash
-mvn clean install
+mvn clean compile jib:dockerBuild
    ```
-
-- Running the application using docker
+ To load the docker image via kind
 ```bash
-docker-compose up
+kind load docker-image drone-management-system
 ```
 
-- Rebuild the docker image after any changes made
-```bash
-docker-compose build
-```
 
 
 #### Running the application locally

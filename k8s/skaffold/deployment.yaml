@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: istio
+  namespace: default
   name: drone-mg
 data:
   postgres_host: postgres
@@ -12,7 +12,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  namespace: istio
+  namespace: default
   name: drone-mg
 stringData:
   postgres_password: topsecret
@@ -21,7 +21,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: drone-management-system-ingress
-  namespace: istio
+  namespace: default
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
@@ -40,7 +40,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: drone-management-system
-  namespace: istio
+  namespace: default
   labels:
     app: drone-management-system
 spec:
@@ -54,7 +54,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: istio
+  namespace: default
   name: drone-management-system
 spec:
   selector:
@@ -128,7 +128,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: db
-  namespace: istio
+  namespace: default
   labels:
     name: postgres-service
     app: drone-management-system

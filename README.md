@@ -62,8 +62,9 @@ kubectl create clusterrolebinding admin-user-binding --clusterrole=cluster-admin
 kubectl create ns istio
 
 kubectl apply -f k8s/skaffold/postgres.yaml
+kubectl apply -f k8s/skaffold/deployment.yaml
 ```
-[deployment.yaml](k8s%2Fskaffold%2Fdeployment.yaml)
+
 Start the `kubectl` Proxy
 Run `kubectl` proxy to access the dashboard:
 

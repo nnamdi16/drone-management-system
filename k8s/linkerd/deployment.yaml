@@ -63,6 +63,8 @@ spec:
   template:
     metadata:
       namespace: linkerd-app
+      annotations:
+        linkerd.io/inject: enabled
       labels:
         app: drone-management-system
     spec:

@@ -54,9 +54,38 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.1/a
 
 - Create a Service Account for Dashboard access
 ```bash
-kubectl -n kubernetes-dashboard create token dashboard-admin-sa
-kubectl create clusterrolebinding admin-user-binding --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:admin-user
+kubectl apply -f k8s/kind/dashboard-adminuser.yaml  
+kubectl apply -f k8s/kind/cluster-role-binding.yaml 
 ```
+
+- Create a token to access the Kubernetes Dashboard
+```bash
+kubectl -n kubernetes-dashboard create token admin-user 
+```
+
+- To deploy the spring boot application using Helm
+```bash
+helm create drone-management-system
+```
+
+- To package the helm chart
+```bash
+helm package drone-management-system
+```
+
+- To install the helm chart to the kubernetes cluster
+```bash
+helm install drone-management-system ./drone-management-system
+```
+
+- To check the status of the helm release
+```bash
+helm status drone-management-system 
+
+- To upgrade the existing helm release
+```bash
+helm upgrade drone-management-system ./drone-management-system
+
 
 ```bash
 kubectl create ns istio
@@ -102,6 +131,20 @@ spring.datasource.password=postgres
  ```bash
 mvn clean compile jib:dockerBuild
    ```
+
+- Deploy both the PostgreSQL container and the drone-management container.
+
+ ```bash
+docker-compose up -d
+   ```
+
+- To check if the docker image is running.
+
+ ```bash
+docker ps
+   ```
+
+
  To load the docker image via kind
 ```bash
 kind load docker-image drone-management-system

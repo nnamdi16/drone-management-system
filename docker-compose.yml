@@ -1,24 +1,32 @@
-services:
-  db:
-    image: postgres:latest
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: drone-management-app
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5433"
+version: '3.8'
 
-  drone-management-system:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: drone-management-system:latest
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    networks:
+      - my-network
+
+  springboot-app:
+    image: drone-management-system
+    container_name: drone-management-system
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      - postgres
+    networks:
+      - my-network
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
 
-volumes:
-  postgres-data:
+networks:
+  my-network:
+    driver: bridge

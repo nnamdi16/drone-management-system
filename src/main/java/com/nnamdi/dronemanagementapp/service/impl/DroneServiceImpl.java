@@ -84,11 +84,11 @@ public class DroneServiceImpl implements DroneService {
     public PageImpl<DroneDto> getDrones(int page, int limit) {
         log.info("about to retrieve all notes by pagination {}, {}", page, limit);
         AppUtil.validatePageRequest(page, limit);
-//        Pageable pageable = PageRequest.of(page - 1, limit);
-//        Page<Drone> drones = droneRepository.findAll(pageable);
-       return apiService.getDrones(page, limit);
-//        List<DroneDto> notesDtoList = drones.getContent().stream().map(note -> modelMapper.map(note, DroneDto.class)).toList();
-//        return new PageImpl<>(droneDto, drones.getPageable(), drones.getTotalElements());
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<Drone> drones = droneRepository.findAll(pageable);
+//       return apiService.getDrones(page, limit);
+        List<DroneDto> droneDto = drones.getContent().stream().map(note -> modelMapper.map(note, DroneDto.class)).toList();
+        return new PageImpl<>(droneDto, drones.getPageable(), drones.getTotalElements());
     }
 
 

@@ -1,0 +1,11 @@
+# templates/configmap.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "drone-management-system.fullname" . }}-config
+  labels:
+    {{- include "drone-management-system.labels" . | nindent 4 }}
+data:
+  service.apigateway.cfg: |-
+{{ .Files.Get "files/service.auth.cfg" | indent 4 }}

@@ -73,14 +73,14 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-livenessProbe:
-  httpGet:
-    path: /api/v1/drone
-    port: 8080
-readinessProbe:
-  httpGet:
-    path: /api/v1/drone
-    port: 8080
+#livenessProbe:
+#  httpGet:
+#    path: /api/v1/drone
+#    port: 8080
+#readinessProbe:
+#  httpGet:
+#    path: /api/v1/drone
+#    port: 8080
 
 autoscaling:
   enabled: false
@@ -90,17 +90,16 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+volumes:
+ - name: config-volume
+   configMap:
+     name: "drone-management-system-config"
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+ - name: config-volume
+   mountPath: "/config/service.auth.cfg"
+   subPath: "service.auth.cfg"
 
 nodeSelector: {}
 

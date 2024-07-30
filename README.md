@@ -152,6 +152,17 @@ curl http://localhost:5000/api/v1/drone
 ```
 
 
+- To create and read the config map from service.auth.cfg:
+  - The file is referenced in the value.yaml file
+  - To view the details of the config map
+```bash
+kubectl get configmaps 
+kubectl describe configmap drone-management-system-config 
+
+
+```
+
+
 ```bash
 kubectl create ns istio
 

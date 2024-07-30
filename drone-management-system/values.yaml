@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: drone-management-system
-  pullPolicy: IfNotPresent
+  pullPolicy: Never
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
@@ -41,8 +41,9 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: ClusterIP
-  port: 80
+  type: NodePort
+  port: 8080
+  nodePort: 32000
 
 ingress:
   enabled: false

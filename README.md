@@ -17,7 +17,46 @@ Welcome to the Drone Management System!. Drone management system is a Spring Boo
 - Apache Maven 3.6.0 or higher
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/download/?section=mac) with the Spring Boot plugin or any other suitable IDE that can run spring boot.
 - [Docker](https://docs.docker.com/get-docker/) or you can set up your [postgres](https://www.postgresql.org/docs/current/tutorial-install.html) database locally.
-- kubectl - (CLI  for accessing Kubernetes)
+- kubectl- (CLI for accessing Kubernetes)
+
+
+### Running the application
+
+#### Running the application via docker
+Follow these steps to run the application:
+
+- Clone the [repository](https://github.com/nnamdi16/drone-management-system.git)
+
+```bash 
+git clone https://github.com/nnamdi16/drone-management-system.git
+cd drone-management-app
+ ```
+
+- Set up your PostgresSQL database and configure the database connection details in **src/main/resources/application.properties**.
+In the application.properties file, the database configuration can be set as seen below:
+```bash
+spring.datasource.url=jdbc:postgresql://db:5432/drone-management-app
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+```
+- Build the application using maven.
+
+ ```bash
+mvn clean compile jib:dockerBuild
+   ```
+
+- Deploy both the PostgreSQL container and the drone-management container.
+
+ ```bash
+docker-compose up -d
+   ```
+
+- To check if the docker image is running.
+
+ ```bash
+docker ps
+   ```
+
 
 ```bash 
  brew install kind
@@ -63,6 +102,11 @@ kubectl apply -f k8s/kind/cluster-role-binding.yaml
 kubectl -n kubernetes-dashboard create token admin-user 
 ```
 
+To load the docker image via kind
+```bash
+kind load docker-image drone-management-system:latest
+```
+
 - To deploy the spring boot application using Helm
 ```bash
 helm create drone-management-system
@@ -86,6 +130,27 @@ helm status drone-management-system
 ```bash
 helm upgrade drone-management-system ./drone-management-system
 
+```
+- To check the service configuration of drone management-system
+```bash
+kubectl get svc drone-management-system -o yaml
+
+```
+
+- To access the API after deployment, temporarily forward the port to your localhost for testing:
+```bash
+kubectl port-forward svc/drone-management-system 5000:8080
+
+
+```
+
+- Then try to access the application via curl:
+```bash
+curl http://localhost:5000/api/v1/drone
+
+
+```
+
 
 ```bash
 kubectl create ns istio
@@ -105,51 +170,6 @@ kubectl proxy --port=8001
 ```bash
 http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 ```
-
-
-### Running the application
-
-#### Running the application via docker
-Follow these steps to run the application:
-
-- Clone the [repository](https://github.com/nnamdi16/drone-management-system.git)
-
-```bash 
-git clone https://github.com/nnamdi16/drone-management-system.git
-cd drone-management-app
- ```
-
-- Set up your PostgresSQL database and configure the database connection details in **src/main/resources/application.properties**.
-In the application.properties file, the database configuration can be set as seen below:
-```bash
-spring.datasource.url=jdbc:postgresql://db:5432/drone-management-app
-spring.datasource.username=postgres
-spring.datasource.password=postgres
-```
-- Build the application using maven.
-
- ```bash
-mvn clean compile jib:dockerBuild
-   ```
-
-- Deploy both the PostgreSQL container and the drone-management container.
-
- ```bash
-docker-compose up -d
-   ```
-
-- To check if the docker image is running.
-
- ```bash
-docker ps
-   ```
-
-
- To load the docker image via kind
-```bash
-kind load docker-image drone-management-system
-```
-
 
 
 #### Running the application locally

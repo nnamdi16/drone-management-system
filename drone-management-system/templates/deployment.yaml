@@ -45,7 +45,7 @@ spec:
               value: "{{ .Values.postgresql.postgresqlPassword }}"
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}80
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}

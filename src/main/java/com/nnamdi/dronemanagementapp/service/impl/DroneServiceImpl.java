@@ -15,6 +15,8 @@ import com.nnamdi.dronemanagementapp.util.DroneUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +36,15 @@ public class DroneServiceImpl implements DroneService {
     private final DroneRepository droneRepository;
     private final MessageProvider messageProvider;
     private final ExternalApiService apiService;
+
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+
+    @Value("${spring.datasource.username}")
+    private String dbUser;
+
+    @Value("${spring.datasource.password}")
+    private String dbPassword;
 
 
     @Override
@@ -82,7 +93,12 @@ public class DroneServiceImpl implements DroneService {
 
     @Override
     public PageImpl<DroneDto> getDrones(int page, int limit) {
+
+        log.info("Database URL: {}", dbUrl);
+        log.info("Database User: {}",  dbUser);
+        log.info("Database Password: {}", dbPassword);
         log.info("about to retrieve all notes by pagination {}, {}", page, limit);
+
         AppUtil.validatePageRequest(page, limit);
         Pageable pageable = PageRequest.of(page - 1, limit);
         Page<Drone> drones = droneRepository.findAll(pageable);

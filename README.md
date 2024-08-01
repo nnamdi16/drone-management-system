@@ -131,6 +131,10 @@ helm status drone-management-system
 helm upgrade drone-management-system ./drone-management-system
 
 ```
+- To debug the helm chart template
+```bash
+helm template drone-management-system ./drone-management-system --debug  
+```
 - To check the service configuration of drone management-system
 ```bash
 kubectl get svc drone-management-system -o yaml

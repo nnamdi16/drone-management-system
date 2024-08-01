@@ -60,3 +60,21 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{- define "fromConfigFile" -}}
+{{- $lines := splitList "\n" . -}}
+{{- $result := "" -}}
+{{- range $line := $lines -}}
+  {{- $trimmedLine := trim $line -}}
+
+  {{- if and (ne (len $trimmedLine) 0) (not (hasPrefix  "#" $trimmedLine)) -}}
+    {{- $kv := splitList "=" $trimmedLine -}}
+    {{- if eq (len $kv) 2 -}}
+      {{- $key := trim (index $kv 0) -}}
+      {{- $value := trim (index $kv 1) -}}
+      {{- $result = printf "%s\n%s: %s" $result $key (quote $value) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $result | nindent 2 -}}
+{{- end -}}

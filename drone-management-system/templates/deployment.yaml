@@ -38,11 +38,23 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:postgresql://postgresql:5432/drone-management-system"
+              valueFrom:
+                configMapKeyRef:
+                  key: spring.datasource.url
+                  name: {{ include "drone-management-system.fullname" . }}-config
+
             - name: SPRING_DATASOURCE_USERNAME
-              value: "{{ .Values.postgresql.postgresqlUsername }}"
+              valueFrom:
+                configMapKeyRef:
+                  key: spring.datasource.username
+                  name: {{ include "drone-management-system.fullname" . }}-config
+
             - name: SPRING_DATASOURCE_PASSWORD
-              value: "{{ .Values.postgresql.postgresqlPassword }}"
+              valueFrom:
+                configMapKeyRef:
+                  key: spring.datasource.password
+                  name: {{ include "drone-management-system.fullname" . }}-config
+
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

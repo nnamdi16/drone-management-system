@@ -1,5 +1,6 @@
 package com.nnamdi.dronemanagementapp.service.impl;
 
+import com.nnamdi.dronemanagementapp.dto.ConfigurationDto;
 import com.nnamdi.dronemanagementapp.dto.DroneDto;
 import com.nnamdi.dronemanagementapp.exception.BadRequestException;
 import com.nnamdi.dronemanagementapp.exception.ModelAlreadyExistException;
@@ -16,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -35,16 +35,22 @@ public class DroneServiceImpl implements DroneService {
     private final DroneUtil droneUtil;
     private final DroneRepository droneRepository;
     private final MessageProvider messageProvider;
-    private final ExternalApiService apiService;
 
-    @Value("${spring.datasource.url}")
-    private String dbUrl;
 
-    @Value("${spring.datasource.username}")
-    private String dbUser;
+    @Value("${vertx.temp.dir}")
+    private String vertxTempDir;
 
-    @Value("${spring.datasource.password}")
-    private String dbPassword;
+    @Value("${vertx.keystore.path}")
+    private String vertxKeyStorePath;
+
+    @Value("${vertx.keystore.password}")
+    private String vertxKeyStorePassword;
+
+    @Value("${vertx.truststore.path}")
+    private String vertxTrustStorePath;
+
+    @Value("${vertx.truststore.password}")
+    private String vertxTrustStorePassword;
 
 
     @Override
@@ -94,10 +100,6 @@ public class DroneServiceImpl implements DroneService {
     @Override
     public PageImpl<DroneDto> getDrones(int page, int limit) {
 
-        log.info("Database URL: {}", dbUrl);
-        log.info("Database User: {}",  dbUser);
-        log.info("Database Password: {}", dbPassword);
-        log.info("about to retrieve all notes by pagination {}, {}", page, limit);
 
         AppUtil.validatePageRequest(page, limit);
         Pageable pageable = PageRequest.of(page - 1, limit);
@@ -105,6 +107,17 @@ public class DroneServiceImpl implements DroneService {
 //       return apiService.getDrones(page, limit);
         List<DroneDto> droneDto = drones.getContent().stream().map(note -> modelMapper.map(note, DroneDto.class)).toList();
         return new PageImpl<>(droneDto, drones.getPageable(), drones.getTotalElements());
+    }
+
+    @Override
+    public ConfigurationDto getConfig() {
+        return ConfigurationDto.builder()
+                .vertexKeyStorePassword(vertxKeyStorePassword)
+                .vertexKeyStorePath(vertxKeyStorePath)
+                .vertexTempDirectory(vertxTempDir)
+                .vertexTrustStorePath(vertxTrustStorePath)
+                .vertexTrustStorePassword(vertxTrustStorePassword)
+                .build();
     }
 
 

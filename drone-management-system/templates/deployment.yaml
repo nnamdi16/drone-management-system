@@ -55,6 +55,37 @@ spec:
                   key: spring.datasource.password
                   name: {{ include "drone-management-system.fullname" . }}-config
 
+            - name: VERTX_TEMP_DIR
+              valueFrom:
+                configMapKeyRef:
+                  key: vertx.temp.dir
+                  name: {{ include "drone-management-system.fullname" . }}-config
+
+            - name: VERTX_KEYSTORE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  key: vertx.keystore.path
+                  name: {{ include "drone-management-system.fullname" . }}-config
+
+            - name: VERTX_KEYSTORE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: vertx.keystore.path
+                  name: {{ include "drone-management-system.fullname" . }}-config
+
+
+            - name: VERTX_TRUSTSTORE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  key: vertx.truststore.path
+                  name: {{ include "drone-management-system.fullname" . }}-config
+
+            - name: VERTX_TRUSTSTORE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: vertx.truststore.password
+                  name: {{ include "drone-management-system.fullname" . }}-config
+
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

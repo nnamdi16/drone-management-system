@@ -9,7 +9,6 @@ import com.nnamdi.dronemanagementapp.repository.DroneRepository;
 import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
 import com.nnamdi.dronemanagementapp.request.UpdateDronePositionDto;
 import com.nnamdi.dronemanagementapp.service.impl.DroneServiceImpl;
-import com.nnamdi.dronemanagementapp.service.impl.ExternalApiService;
 import com.nnamdi.dronemanagementapp.util.Direction;
 import com.nnamdi.dronemanagementapp.util.DroneUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,8 +44,8 @@ class DroneServiceTest {
     private ModelMapper modelMapper;
     @Mock
     private DroneUtil droneUtil;
-    @Mock
-    private ExternalApiService externalApiService;
+//    @Mock
+//    private ExternalApiService externalApiService;
 
 
     @BeforeEach
@@ -54,7 +53,7 @@ class DroneServiceTest {
         MockitoAnnotations.openMocks(this);
         modelMapper = new ModelMapper();
         messageProvider = new MessageProvider(messageSource);
-        droneService = new DroneServiceImpl(modelMapper, droneUtil, droneRepository, messageProvider, externalApiService);
+        droneService = new DroneServiceImpl(modelMapper, droneUtil, droneRepository, messageProvider);
     }
 
     @Test

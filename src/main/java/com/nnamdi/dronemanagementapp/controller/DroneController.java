@@ -1,5 +1,6 @@
 package com.nnamdi.dronemanagementapp.controller;
 
+import com.nnamdi.dronemanagementapp.dto.ConfigurationDto;
 import com.nnamdi.dronemanagementapp.dto.DroneDto;
 import com.nnamdi.dronemanagementapp.dto.Response;
 import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
@@ -36,6 +37,13 @@ public class DroneController {
     @GetMapping("/{droneId}")
     public ResponseEntity<Response<DroneDto>> getDrone(@PathVariable("droneId") String droneId) {
         Response<DroneDto> response = responseUtil.getSuccessResponse(droneService.getDronePosition(droneId));
+        return ResponseEntity.ok(response);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/config")
+    public ResponseEntity<Response<ConfigurationDto>> getConfig() {
+        Response<ConfigurationDto> response = responseUtil.getSuccessResponse(droneService.getConfig());
         return ResponseEntity.ok(response);
     }
 

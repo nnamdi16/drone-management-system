@@ -1,5 +1,6 @@
 package com.nnamdi.dronemanagementapp.service;
 
+import com.nnamdi.dronemanagementapp.dto.ConfigurationDto;
 import com.nnamdi.dronemanagementapp.dto.DroneDto;
 import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
 import com.nnamdi.dronemanagementapp.request.UpdateDronePositionDto;
@@ -17,4 +18,6 @@ public interface DroneService {
     DroneDto getDronePosition(String id);
 
     PageImpl<DroneDto> getDrones(int page, int limit);
+
+    ConfigurationDto getConfig();
 }

@@ -22,8 +22,8 @@ import java.util.List;
 @Slf4j
 public class ExternalApiService {
     private  final RestTemplate restTemplate;
-    @Value("${drone.management.api.base-url}")
-    private String baseUrl;
+//    @Value("${drone.management.api.base-url}")
+//    private String baseUrl;
 
     public ExternalApiService( RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -32,7 +32,7 @@ public class ExternalApiService {
 
     public PageImpl<DroneDto> getDrones(int page, int limit) {
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/api/v1/drone")
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl("" + "/api/v1/drone")
                 .queryParam("page", page)
                 .queryParam("limit", limit);
 

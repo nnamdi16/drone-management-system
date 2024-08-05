@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   postgres:
@@ -14,7 +14,7 @@ services:
       - my-network
 
   springboot-app:
-    image: drone-management-system
+    image: drone-management-system:latest
     container_name: drone-management-system
     ports:
       - "8080:8080"
@@ -23,9 +23,14 @@ services:
     networks:
       - my-network
     environment:
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      VERTX_TEMP_DIR: ${VERTX_TEMP_DIR}
+      VERTX_KEYSTORE_PATH: ${VERTX_KEYSTORE_PATH}
+      VERTX_KEYSTORE_PASSWORD: ${VERTX_KEYSTORE_PASSWORD}
+      VERTX_TRUSTSTORE_PATH: ${VERTX_TRUSTSTORE_PATH}
+      VERTX_TRUSTSTORE_PASSWORD: ${VERTX_TRUSTSTORE_PASSWORD}
 
 networks:
   my-network:

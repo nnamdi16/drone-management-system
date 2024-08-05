@@ -8,10 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DroneManagementAppApplication {
 
     public static void main(String[] args) {
-//        SpringApplication.run(DroneManagementAppApplication.class, args);
-        SpringApplication app = new SpringApplication(DroneManagementAppApplication.class);
-        app.addInitializers(new DotenvInitializer());
-        app.run(args);
+        SpringApplication.run(DroneManagementAppApplication.class, args);
+//        SpringApplication app = new SpringApplication(DroneManagementAppApplication.class);
+//        app.addInitializers(new DotenvInitializer());
+//        app.run(args);
     }
 
 }

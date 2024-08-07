@@ -1,10 +1,34 @@
+{{- range .Values.env }}
+  {{- $valueTrimmed := .value | trim }}
+  {{- $isFile := hasPrefix "files/" $valueTrimmed }}
+
+  {{- if $isFile }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "drone-management-system.fullname" . }}-config
+  name: {{ .name }}-config
   labels:
-    {{- include "drone-management-system.labels" . | nindent 4 }}
+    app: {{ $.Chart.Name }}
+    release: {{ $.Release.Name }}
 data:
-{{ include "fromConfigFile" ( .Files.Get "files/service.auth.cfg" ) | indent 2 }}
+  {{ .name }}: |- {{ $.Files.Get .value | indent 4 }}
+  {{- end }}
+{{- end }}
 
-
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-config
+  labels:
+    app: {{ $.Chart.Name }}
+    release: {{ $.Release.Name }}
+data:
+  {{- range .Values.env }}
+    {{- $valueTrimmed := .value | trim }}
+    {{- $isFile := hasPrefix "files/" $valueTrimmed  }}
+    {{- if not $isFile }}
+      {{ .name }}: {{ tpl .value $ | quote }}
+    {{- end }}
+  {{- end }}

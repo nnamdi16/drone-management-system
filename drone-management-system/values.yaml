@@ -27,6 +27,7 @@ serviceAccount:
 
 podAnnotations: {}
 podLabels: {}
+revisionHistoryLimit: 2
 
 
 podSecurityContext: {}
@@ -112,9 +113,21 @@ postgresql:
   postgresqlUsername: postgres
 
 env:
-  - name: SPRING_DATASOURCE_URL
+  - name: spring.datasource.url
     value: "jdbc:postgresql://postgresql:5432/drone-management-system"
-  - name: SPRING_DATASOURCE_USERNAME
+  - name: spring.datasource.username
     value: "{{ .Values.postgresql.postgresqlUsername }}"
-  - name: SPRING_DATASOURCE_PASSWORD
+  - name: spring.datasource.password
     value: "{{ .Values.postgresql.postgresqlPassword }}"
+  - name: vertx.temp.dir
+    value: "/users/santhoshkumarneelam/install-im/tmp/vertx-cache"
+  - name: vertx.keystore.path
+    value: "/config/gpi/santhoshs-MBP_keystore.jks"
+  - name: vertx.keystore.password
+    value: "Admin#123"
+  - name: vertx.truststore.path
+    value: "/config/gpi/santhoshs-MBP_truststore.jks"
+  - name: vertx.truststore.password
+    value: "Admin#123"
+  - name: service.auth.cfg
+    value: "files/service.auth.cfg"

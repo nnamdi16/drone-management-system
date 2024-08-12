@@ -1,6 +1,8 @@
 package com.nnamdi.dronemanagementapp.service.impl;
 
-import com.nnamdi.dronemanagementapp.dto.ConfigurationDto;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nnamdi.dronemanagementapp.dto.DroneDto;
 import com.nnamdi.dronemanagementapp.exception.BadRequestException;
 import com.nnamdi.dronemanagementapp.exception.ModelAlreadyExistException;
@@ -16,15 +18,18 @@ import com.nnamdi.dronemanagementapp.util.DroneUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 
 @Service
@@ -35,22 +40,8 @@ public class DroneServiceImpl implements DroneService {
     private final DroneUtil droneUtil;
     private final DroneRepository droneRepository;
     private final MessageProvider messageProvider;
+    private static final String DIRECTORY_PATH = "config/";
 
-
-    @Value("${vertx.temp.dir}")
-    private String vertxTempDir;
-
-    @Value("${vertx.keystore.path}")
-    private String vertxKeyStorePath;
-
-    @Value("${vertx.keystore.password}")
-    private String vertxKeyStorePassword;
-
-    @Value("${vertx.truststore.path}")
-    private String vertxTrustStorePath;
-
-    @Value("${vertx.truststore.password}")
-    private String vertxTrustStorePassword;
 
 
     @Override
@@ -104,21 +95,38 @@ public class DroneServiceImpl implements DroneService {
         AppUtil.validatePageRequest(page, limit);
         Pageable pageable = PageRequest.of(page - 1, limit);
         Page<Drone> drones = droneRepository.findAll(pageable);
-//       return apiService.getDrones(page, limit);
         List<DroneDto> droneDto = drones.getContent().stream().map(note -> modelMapper.map(note, DroneDto.class)).toList();
         return new PageImpl<>(droneDto, drones.getPageable(), drones.getTotalElements());
     }
 
     @Override
-    public ConfigurationDto getConfig() {
-        return ConfigurationDto.builder()
-                .vertexKeyStorePassword(vertxKeyStorePassword)
-                .vertexKeyStorePath(vertxKeyStorePath)
-                .vertexTempDirectory(vertxTempDir)
-                .vertexTrustStorePath(vertxTrustStorePath)
-                .vertexTrustStorePassword(vertxTrustStorePassword)
-                .build();
+    public JsonNode readFilesContent() {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode resultNode = mapper.createObjectNode();
+
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(DIRECTORY_PATH))) {
+            for (Path path : directoryStream) {
+                if (Files.isRegularFile(path)) {
+                    Properties properties = new Properties();
+                    properties.load(Files.newInputStream(path));
+
+                    Map<String, String> map = new HashMap<>();
+                    for (String name : properties.stringPropertyNames()) {
+                        map.put(name, properties.getProperty(name));
+                    }
+
+                    JsonNode fileNode = mapper.convertValue(map, JsonNode.class);
+                    resultNode.set(path.getFileName().toString(), fileNode);
+                }
+            }
+        } catch (IOException ex) {
+            throw new NotFoundException(messageProvider.fileNotFound(DIRECTORY_PATH));
+        }
+
+        return resultNode;
     }
+
+
 
 
 }

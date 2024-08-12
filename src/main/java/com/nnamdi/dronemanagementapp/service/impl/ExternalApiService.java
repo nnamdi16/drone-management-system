@@ -37,7 +37,6 @@ public class ExternalApiService {
                 .queryParam("limit", limit);
 
         String url = uriBuilder.toUriString();
-        System.out.println(url);
 
 
         ResponseEntity<Response<Data<DroneDto>>> response = restTemplate.exchange(

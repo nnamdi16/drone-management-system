@@ -94,13 +94,14 @@ autoscaling:
 volumes:
  - name: config-volume
    configMap:
-     name: "drone-management-system-config"
+     name: "service-auth-config"
+
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts:
  - name: config-volume
-   mountPath: "/config/service.auth.cfg"
-   subPath: "service.auth.cfg"
+   mountPath: "/config"
+#   subPath: "service.auth.cfg"
 
 nodeSelector: {}
 
@@ -112,22 +113,962 @@ postgresql:
   postgresqlPassword: postgres
   postgresqlUsername: postgres
 
-env:
-  - name: spring.datasource.url
-    value: "jdbc:postgresql://postgresql:5432/drone-management-system"
-  - name: spring.datasource.username
-    value: "{{ .Values.postgresql.postgresqlUsername }}"
-  - name: spring.datasource.password
-    value: "{{ .Values.postgresql.postgresqlPassword }}"
-  - name: vertx.temp.dir
-    value: "/users/santhoshkumarneelam/install-im/tmp/vertx-cache"
-  - name: vertx.keystore.path
-    value: "/config/gpi/santhoshs-MBP_keystore.jks"
-  - name: vertx.keystore.password
-    value: "Admin#123"
-  - name: vertx.truststore.path
-    value: "/config/gpi/santhoshs-MBP_truststore.jks"
-  - name: vertx.truststore.password
-    value: "Admin#123"
-  - name: service.auth.cfg
-    value: "files/service.auth.cfg"
+
+
+configMaps:
+  - name: service-auth-config
+    filename: service.auth.cfg
+    properties:
+      #
+      # Service "auth", local configuration
+      #
+
+
+
+      ################################################################################
+      # General AUTH-Service configuration
+      ################################################################################
+      #
+      # Additional properties may be added according to the variables in
+      # in the file specified in 'auth.baseconfig.json.file'
+
+      # Base-Configuration File
+      auth.baseconfig.json.file: /config//service.archive.base.json
+
+      # Path to importfile
+      auth.importconfig.path: /config//service.auth.importconfig.json
+
+      ###########################
+      # Runtime Database
+      #
+      #db.url: jdbc:mysql://mysql/im_auth?useServerPrepStmts: true&useUnicode: true&characterEncoding: UTF-8&useJDBCCompliantTimezoneShift: true&useLegacyDatetimeCode: false&serverTimezone: Europe/Berlin
+      db.url: jdbc:mysql://mysql/im_archive?
+      db.user: im_user
+      db.password: im_user123
+      db.pool.size.idle.min: 5
+      db.pool.size.max: 10
+      db.pool.connection.timeout.millis: 300000
+      db.pool.connection.lifetime.max.millis: 1800000
+
+      spring.datasource.url: jdbc:postgresql://postgresql:5432/drone-management-systemssssssss
+      spring.datasource.username: postgres
+      spring.datasource.password: postgres
+      project.name: Drone Management System
+      project.description: Drone Management System REST API
+      springdoc.swagger-ui.path: /swagger-ui.html
+      spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+      spring.datasource.driver-class-name: org.postgresql.Driver
+      project.version: 1.0
+
+      # Additional connection properties for created DataSources prefixed with 'db.connectionproperty.'
+      #
+      #'oracle.jdbc.javaNetNio: false' prevents
+      #'java.sql.SQLRecoverableException: I/O-Fehler: Socket read interrupted'
+      #when using Oracle Databases
+      db.connectionproperty.oracle.jdbc.javaNetNio: false
+
+      # Kc JPA-Provider Settings
+      #
+      keycloak.connectionsJpa.initializeEmpty: true
+      keycloak.connectionsJpa.migrationStrategy: update
+      keycloak.connectionsJpa.showSql: false
+      keycloak.connectionsJpa.formatSql: true
+      keycloak.connectionsJpa.globalStatsInterval: -1
+
+
+      ###########################
+      # Additional network configuration
+      #
+      # Setting of the base uri to use for redirecting and references in
+      # the OIDC discovery
+      #
+      # ID of the ProviderFactory to use.
+      # "headerBased" is our "HeaderBasedHostnameProviderFactory"
+      keycloak.hostname.provider: headerBased
+      # The name of the request header to use for determining the external base url.
+      # - When not set the default behavior is applied (of the DefaultHostnameProvider)
+      keycloak.hostname.headerBased.headername: x-base-external
+
+      # The name of the header used to communicate the address of an client when
+      # requests are routed thru proxies.
+      vertx.requesthandler.forwardedfor.headername: x-forwarded-for
+
+      # The maximum time to wait for new data to arrive in milliseconds or '-1' when no
+      # timeout should be applied.
+      # (applies to incoming request)
+      request.read.timeout.millis: 60000
+
+      ###########################
+      # Truststore configuration
+      #
+      # Truststore that is used for outgoing communication
+      # (by the Keycloak HTTPClient, LDAP-Client, ...)
+      keycloak.truststoreprovider.file: /config//santhoshs-MBP_truststore.jks
+      keycloak.truststoreprovider.passoword: Admin#123
+      # How and if hostnames in the certificates SAN and CN
+      # should be utilized.
+      # One of:
+      # 'WILDCARD' - Wildcards can be used in hostnames, e.g. '*.test.com'
+      #              would match 'my.test.com' and 'your.test.com'
+      # 'STRICT'   - Exact matching, e.g. 'my.test.com' would only match exactly
+      #              that hostname.
+      # 'ANY'      - The servers hostnames are not validated
+      keycloak.truststoreprovider.hostnameverification: WILDCARD
+
+      ###########################
+      # HttpClient configuration
+      #
+      # Parameters used by the Keycloak HTTPClient that is utilized for
+      # outgoing auth requests, e.g. for when using Identity Brokering.
+      keycloak.httpclient.max-connection-idle-time-millis: 1000
+      keycloak.httpclient.establish-connection-timeout-millis: 5000
+      keycloak.httpclient.socket-timeout-millis: 5000
+      keycloak.httpclient.connection-pool-size: 128
+      keycloak.httpclient.max-pooled-per-route: 64
+      keycloak.httpclient.disable-cookies: true
+      keycloak.httpclient.client-keystore:
+      keycloak.httpclient.client-keystore-password:
+      keycloak.httpclient.client-key-password:
+      keycloak.httpclient.disable-trust-manager: false
+      # Proxy Config
+      # as '${targetHostRegex};${proxyAddress}' or '${targetHostRegex};NO_PROXY'
+      # Example:
+      # keycloak.httpclient.proxy-mapping-1: .*;http://proxy.corp.de:8080
+      # keycloak.httpclient.proxy-mapping-2: (localhost|127.0.0.1);NO_PROXY
+      #
+      keycloak.httpclient.proxy-mapping-1: .*;NO_PROXY
+      keycloak.httpclient.proxy-mapping-2: .*;NO_PROXY
+
+
+      ###########################
+      # Lock configuration
+      #
+      # The time in Milliseconds after which locks should expire/need to be refreshed.
+      # A value of '0' signals that Locks should not expire.
+      #
+      # For general-purpose Locks
+      locks.general.expiry: 300000
+      # For Interface Manager specific Locks
+      locks.im.expiry: 300000
+
+      ###########################
+      # IM-Client configuration
+      #
+      # Realm name where the client is located.
+      keycloak.realm.im.name: im
+      # Client name.
+      keycloak.im.client.name: im
+      # A list of valid redirect-URIs separated by ";" that will be added to the list of
+      # valid redirect URIs if not already present.
+      # E.g. "de.dtpublic.impulse://callback;https://fxgui.im.local/authorization-code/callback;/*"
+      keycloak.client.im.validredirecturis: de.dtpublic.impulse://callback;https://fxgui.im.local/authorization-code/callback;/*
+
+      ###########################
+      # Theme configuration
+      #
+      # Value for the Cache-Control: max-age HTTP-Header-Value.
+      keycloak.theme.staticMaxAge: 2592000
+      # Should Theme-Templates be cached? "false" is handy for development.
+      keycloak.theme.cacheTemplates: true
+      # Should Themes be cached? "false" is handy for development.
+      keycloak.theme.cacheThemes: true
+      # Path to the folder where custom Themes can be placed.
+      keycloak.theme.dir: ./business/service.auth.themes.custom/
+
+      ################################################################################
+      # General microservice configuration
+      ################################################################################
+
+      ###########################
+      # diagnose framework configuration
+      #
+      # each class capable to serve diagnose monitoring and providing measuring points
+      # has to be specified with the prefix DIAG_PREFIX.<classname>
+      #DIAG_PREFIX.<classname>
+
+      ###########################
+      # password encryption framework configuration
+      #
+      IM.IPasswordReader.class:
+      IM.IPasswordReader.jar:
+
+      ###########################
+      # further adjustments
+      #
+      # Log4j configuration file
+      #Logging.properties: /config//log4j_auth.properties
+      Logging.properties:
+
+      # The logical servername defines a cluster node name of the Interface Manager.
+      # Even if the platform is not started in cluster mode a unique name has to be
+      # defined, preventing interference of different platform installations in the
+      # same network.
+      Logical.Servername: IM Server
+
+      # defines whether the Interface Manager platform is running in cluster mode.
+      # allowed values: true | false
+      Cluster.Node: false
+
+
+      ################################################################################
+      # vert.x cluster configuration
+
+      ###########################
+      # general adjustments
+      #
+      vertx.temp.dir: /users/santhoshkumarneelam/install-im/tmp/vertx-cache
+      vertx.keystore.path: /config//santhoshs-MBP_keystore.jks
+      #vertx.keystore.path:
+      vertx.keystore.password: Admin#123
+      vertx.truststore.path: /config//santhoshs-MBP_truststore.jks
+      #vertx.truststore.path:
+      vertx.truststore.password: Admin#123
+
+      ###########################
+      # in-memory data grid adjustments for the service discovery
+      #
+
+      # select the imdg.
+      # 'hazelcast' or 'infinispan'
+      cluster.imdg.select: infinispan
+
+      # hazelcast configuration file, defining multicast or dedicated node discovery
+      hazelcast.config: /config//hazelcast.auth.xml
+
+      # infinispan-specific configuration
+      ##########
+      #
+      # infinispan configuration file
+      infinispan.config: /config//infinispan.auth.xml
+      #infinispan.config: /config//infinispan.default.xml
+      # infinispan transport stack name, available defaults are: "prod_encrypted_tcp_tcpping", "prod_encrypted_udp_multicast"
+      infinispan.transport.stack.name: prod_unencrypted_tcp_dnsping_kubernetes
+      infinispan.cluster.name: IM Cluster Group
+      infinispan.node.name: auth
+
+      # infinispan host- and port configuration
+      # bind address to use for communication and key exchange
+      # - for special values like "SITE_LOCAL", "NON_LOOPBACK" or "match-interface"
+      #   see: http://www.jgroups.org/manual4/index.html#Transport
+      infinispan.jgroups.bind.address: SITE_LOCAL
+      # bind port
+      infinispan.jgroups.bind.port: 7800
+      # increment the port up to the given range if the port is blocked - '0' means that
+      # startup fails when the exact "infinispan.jgroups.bind.port" is blocked
+      infinispan.jgroups.bind.port.range: 0
+
+      # infinispan configuration for multicast setups, e.g. "prod_encrypted_udp_multicast"
+      #
+      # multicast address
+      infinispan.jgroups.mcast_addr: 228.6.7.8
+      # multicast port
+      infinispan.jgroups.mcast_port: 46655
+
+      # infinispan configuration for tcpping setups, e.g. "prod_encrypted_tcp_tcpping"
+      #
+      # list of the cluster nodes hosts/ports
+      # - format: "host1[port1],host2[port2],..."
+      infinispan.jgroups.tcpping.initial_hosts:
+      # allows to probe on additional port for
+      # the given hosts by incrementing the ports up to the
+      # given range
+      infinispan.jgroups.tcpping.port_range: 0
+
+      # infinispan configuration for key-exchange
+      #
+      # the bind port to use for key exchange
+      infinispan.jgroups.ssl.key.exchange.bind.port: 2952
+      infinispan.jgroups.ssl.key.exchange.bind.port.range: 0
+      infinispan.jgroups.ssl.key.exchange.client.auth.enabled: true
+      infinispan.jgroups.dns.query: clustered-app.default.svc.cluster.local
+      vertx.eventbus.use.alpn: true
+      vertx.eventbus.use.pooled.buffers: true
+      vertx.eventbus.host: archive.default.svc.cluster.local
+      vertx.eventbus.port: 9092
+      vertx.eventbus.public.host: auth
+      vertx.eventbus.public.port: -1
+      vertx.eventbus.client.auth: NONE
+      vertx.eventbus.trust.all.servers: true
+      vertx.http.port: 8080
+      vertx.http.host: auth.default.svc.cluster.local
+      vertx.http.public.host: auth
+      vertx.http.use.alpn: true
+      vertx.http.use.pooled.buffers: true
+      vertx.http.client.auth: NONE
+      vertx.http.trust.all.servers: true
+      vertx.executor.pick.effort: 5
+      vertx.executor.send.retries: 3
+      vertx.executor.send.backoff.first: 500
+      vertx.executor.send.backoff.max: 15000
+      vertx.executor.send.jitter: 0.5
+      vertx.executor.circuit.failure.threshold: 15
+      vertx.executor.circuit.failure.executions: 20
+      vertx.executor.circuit.success.threshold: 6
+      vertx.executor.circuit.success.executions: 10
+      vertx.executor.circuit.delay: 60000
+      vertx.executor.backup: com.tsystems.interfaceManager.service.util.loadbalance.backup.file.VertxFilesystemBackupStrategy
+      vertx.executor.backup.file.directory: /users/santhoshkumarneelam/install-im/backup
+      vertx.executor.backup.file.directory.limit: 10000
+      vertx.executor.backup.file.restore.delay: 15000
+      logger.memory.interval: 60
+      metrics.enabled: true
+      metrics.gc.enabled: true
+      metrics.memory.enabled: true
+      metrics.cpu.enabled: true
+      metrics.thread.enabled: true
+      metrics.vertx.enabled: true
+      metrics.prometheus.enabled: false
+      metrics.prometheus.descriptions: true
+      metrics.prometheus.step: 50000
+
+  - name: service-archive-config
+    filename: service.archive.cfg
+    properties:
+      
+      # Archive Service, local configuration
+      #
+
+      ################################################################################
+      # General microservice configuration
+      ################################################################################
+
+      ###########################
+      # diagnose framework configuration
+      #
+      # each class capable to serve diagnose monitoring and providing measuring points
+      # has to be specified with the prefix DIAG_PREFIX.<classname>
+      DIAG_PREFIX.com.tsystems.interfaceManager.service.util.database.api.IGenericConnectionPool: DBPOOL
+      DIAG_PREFIX.com.tsystems.interfaceManager.service.archive.impl.LogWriter: LGW
+
+      ###########################
+      # password encryption framework configuration
+      #
+      IM.IPasswordReader.class: "@im.passwordreader.class@"
+      IM.IPasswordReader.jar: "@im.passwordreader.jar@"
+
+      ###########################
+      # further adjustments
+      #
+      # Log4j configuration file
+      Logging.properties: "@im.install.dir@@file.separator@conf@file.separator@log4j_archive.properties"
+
+      # The logical servername defines a cluster node name of the Interface Manager.
+      # Even if the platform is not started in cluster mode a unique name has to be
+      # defined, preventing interference of different platform installations in the
+      # same network.
+      Logical.Servername: "@logical.servername@"
+
+      # defines whether the Interface Manager platform is running in cluster mode.
+      # allowed values: true | false
+      Cluster.Node: "@cluster.node@"
+
+
+      ################################################################################
+      # Runtime Database
+
+      # general adjustments
+      DB.Adapter: "@im.service.archive.db.adapter@"
+      DB.Url: "@im.service.archive.db.url@"
+      DB.Driver: "@im.service.archive.db.driver@"
+      DB.UserName: "@im.service.archive.db.user@"
+      DB.Password: "@im.service.archive.db.pwd@"
+
+      # Minimale Anzahl von DB-Verbindungen im Cache/Pool. Standardwert fuer alle
+      # DBMS, kann z.B. fuer Oracle UCP bzw. Oracle ICC auch mit dem optionalen
+      # Parameter 'DB.OraUCP.MinPoolSize' bzw. 'DB.OraICC.MinLimit' festgelegt werden.
+      DB.MinConnections :  "@im.service.archive.db.min.connections@"
+
+      # Maximale Anzahl von DB-Verbindungen im Cache/Pool. Standardwert fuer alle
+      # DBMS, kann z.B. fuer Oracle UCP bzw. Oracle ICC auch mit dem optionalen
+      # Parameter 'DB.OraUCP.MaxPoolSize' bzw. 'DB.OraICC.MaxLimit' festgelegt werden.
+      DB.MaxConnections :  "@im.service.archive.db.max.connections@"
+
+      # Schema zur Verwaltung von DB-Verbindungen im Cache. Standardwert fuer alle
+      # DBMS, kann z.B. fuer Oracle ICC auch mit dem optionalen Parameter
+      # 'DB.OraICC.CacheScheme' festgelegt werden.
+      DB.ConnectionScheme: DYNAMIC_SCHEME
+
+      # Maximale Wartezeit bei FIXED_WAIT_SCHEME (siehe DB.ConnectionScheme).
+      # Standardwert fuer alle DBMS, kann z.B. fuer Oracle ICC auch mit dem optionalen
+      # Parameter 'DB.OraICC.CacheFixedWaitIdleTime' festgelegt werden.
+      DB.CacheFixedWaitIdleTime: 30
+
+      DB.LoginTimeout: "@im.service.archive.db.timeout.login@"
+      DB.NetworkTimeout: "@im.service.archive.db.timeout.network@"
+      DB.QueryTimeout: "@im.service.archive.db.timeout.query@"
+
+      # Verfahren zum performanceoptimierten Laden von Daten aus der DB
+      # Der Standardwert PREDEFINED ueberlaesst dem jeweiligen Adapter die Auswahl des
+      # geeigneten Verfahrens fuer das DBMS.
+      # Weitere Werte, z.B.: JOIN_ALL, SEPARATE_ELEMENTS, SEPARATE_CHILDREN
+      DB.JoinMode: PREDEFINED
+
+      ###########################
+      # optionale Konfiguration fuer diverse Datenbanken (vorbereitet):
+      #
+      # Maximum number of checklists a profile to be deleted is allowed to have,
+      # when removing it from the table 'profile' with delete-on-cascade; if more
+      # are stored for the ProfileID in the database, they will be removed from
+      # table 'checklist' before in chunks of the same size. For MySQL this is a
+      # behaviour preventing the DBMS from heap-overflowing when removing big
+      # runtime profiles (a topic at least from version 5.6ff).
+      # For Oracle this is a behaviour preventing the undo tablespace from
+      # exceeding.
+      # The default value if not set is 1.000
+      #DB.MySQL.maxChecklistCountPerDelete: 1000
+      #DB.OraUCP.maxChecklistCountPerDelete: 1000
+      #DB.OraICC.maxChecklistCountPerDelete: 1000
+      #DB.MSSQL.maxChecklistCountPerDelete: 1000
+      #DB.hsqldb.maxChecklistCountPerDelete: 1000
+
+      ###########################
+      # optionale Konfiguration fuer Oracle UCP (ab Oracle 11; bei DB-Adapter
+      # "OracleUCPAdapter"):
+      #
+      # Table Space definition, used when creating bplookup table and indexes
+      # when not present
+      DB.OraUCP.TableSpaceData: "@im.db.tablespace.data@"
+      DB.OraUCP.TableSpaceIndex: "@im.db.tablespace.index@"
+
+      # Cursor Sharing policy
+      # moegliche Werte: DEFAULT, SIMILAR, EXACT, FORCE
+      DB.OraUCP.CursorSharing: DEFAULT
+
+      # moegliche zusaetzliche Konfiguration fuer Oracle UCP (ab Oracle 11):
+      DB.OraUCP.ConnectionFactoryClassName: "@oracle.ucp.connectionFactoryClassName@"
+
+      #DB.OraUCP.ConnectionPoolNamePrefix: ServerPool-
+      #DB.OraUCP.Description: archiveDatabase
+      #DB.OraUCP.InitialPoolSize: 3
+
+      # Minimale Anzahl von DB-Verbindungen im Pool. Der Standardwert fuer alle
+      # DBMS wird mit dem Parameter 'DB.MinConnections' festgelegt, hiermit kann
+      # eine Definition nur fuer Oracle UCP erfolgen.
+      #DB.OraUCP.MinPoolSize: @im.service.archive.db.min.connections@
+
+      # Maximale Anzahl von DB-Verbindungen im Pool. Der Standardwert fuer alle
+      # DBMS wird mit dem Parameter 'DB.MaxConnections' festgelegt, hiermit kann
+      # eine Definition nur fuer Oracle UCP erfolgen.
+      #DB.OraUCP.MaxPoolSize: @im.service.archive.db.max.connections@
+
+      DB.OraUCP.InactiveConnectionTimeout: 60
+      #DB.OraUCP.AbandonedConnectionTimeout: 0
+      #DB.OraUCP.ConnectionWaitTimeout: 3
+      #DB.OraUCP.TimeToLiveConnectionTimeout: 0
+      DB.OraUCP.TimeoutCheckInterval: 60
+      #DB.OraUCP.FastConnectionFailoverEnabled: false
+      DB.OraUCP.MaxStatements: 0
+      #DB.OraUCP.MaxIdleTime: 0
+      #DB.OraUCP.PropertyCycle: 30
+      #DB.OraUCP.ServerName:
+      #DB.OraUCP.PortNumber:
+      #DB.OraUCP.DatabaseName:
+      #DB.OraUCP.DataSourceName:
+      #DB.OraUCP.NetworkProtocol:
+      #DB.OraUCP.RoleName:
+      #DB.OraUCP.ValidateConnectionOnBorrow: false
+      #DB.OraUCP.SQLForValidateConnection:
+      #DB.OraUCP.ConnectionHarvestTriggerCount: 2147483647
+      #DB.OraUCP.ConnectionHarvestMaxCount: 1
+      #DB.OraUCP.ONSConfiguration:
+      #DB.OraUCP.MaxConnectionReuseTime: 0
+      #DB.OraUCP.MaxConnectionReuseCount: 0
+      #DB.OraUCP.ConnectionFactoryProperty.<name1>: value1
+      #DB.OraUCP.ConnectionFactoryProperty.<name2>: value2
+      #DB.OraUCP.ConnectionProperty.<name1>: value1
+      #DB.OraUCP.ConnectionProperty.<name2>: value2
+
+      ###########################
+      # zusaetzliche Konfiguration fuer MySQL (vorbereitet):
+      #
+      #DB.MySQL.<name>: value
+
+      ###########################
+      # zusaetzliche Konfiguration fuer MariaDB (vorbereitet):
+      #
+      #DB.MariaDB.<name>: value
+
+      ###########################
+      # zusaetzliche Konfiguration fuer PostgreSQL (vorbereitet):
+      #
+      #DB.PostgreSQL.<name>: value
+
+      ###########################
+      # zusaetzliche Konfiguration fuer MS SQL Server (vorbereitet):
+      #
+      #DB.MSSQL.<name>: value
+
+      ###########################
+      # zusaetzliche Konfiguration fuer HyperSQL (hsqldb) (vorbereitet):
+      #
+      #DB.hsqldb.<name>: value
+
+
+      ################################################################################
+      # RuntimePersistenceHandler configuration
+
+      # Setting the following property to 'true' puts the prioritized commits in the
+      # business logging framework one step further: Job execution will not finish
+      # before the changes have been committed to the business logging framework,
+      # when processing jobs in strict mode.
+      # Consequences when the default file system implementation of the business
+      # logging is used:
+      # (See also: IM.BL.ConnectionProperty.messagejournal.filesystem.commitdelay)
+      # - Setting this property to 'true' slows down Job executions by (worst case)
+      #   10% of the 'commitdelay' plus the time that the actual commit takes.
+      # - So for the default commit delay of 2 seconds (10%: 200ms) and a example
+      #   commit time of 20ms the first Job execution in a 200ms-frame would have
+      #   220ms of overhead.
+      IM.RPH.businesslogging.strictmode.wait_for_commit: false
+
+      # maximum wait time for persisting messages in the business logging framework
+      # when processing jobs in strict mode. In case of a time out the caller will be
+      # released, will the persist action still goes on. This timeout is only active,
+      # when: IM.LRPH.businesslogging.strictmode.wait_for_commit is set to 'true'
+      IM.RPH.businesslogging.strictmode.max_wait_time: 5
+
+
+      ################################################################################
+      # LogWriter configuration
+
+      ##
+      # LogWriter archive format CONFIGURATION
+      #
+      # The archive format decides about the event partitioning. You can combine
+      # different qualifiers for year/month/day etc.. Use these qualifiers:
+      # yyyy - year
+      # MM   - month in a year
+      # dd   - day in a month
+      # HH   - hour in a day
+      # mm   - minute in a hour (might be inperfomant because it's a very tight
+      #        intervall)
+      # E    - day in a week
+      # DDD  - day in a year
+      # ww   - week in a year
+      # WW   - week in a month
+      ##
+
+      IM.LGW.ArchiveType :  rtProfile
+      IM.LGW.ArchiveFormat :  "@im.service.archive.lgw.format@"
+      IM.LGW.BackupRootDir :  "@im.install.dir@@file.separator@backup"
+      IM.LGW.FilePerDirLimit: 10000
+
+      ##
+      # LogWriter database check algorithm CONFIGURATION
+      #
+      # The check algorithm decides, whether the LogWriter is working in normal
+      # bounds (with the database) or whether it is generally better to switch
+      # to the filesystem as current persistence layer or whether the connection
+      # pool might be reset (e.g. in case database write access takes too long
+      # time). If it will be switched to the filesystem, a thread is started,
+      # which frequently checks, whether the database is available again and
+      # resets the connection pool.
+      #
+      # NOTE: The primary goal of this algorithm is NOT to switch to the filesystem
+      #       as fast as possible in case of an SQLException, furthermore it should
+      #       prevent the StatusMachine's internal cache from overflowing and
+      #       causing an OutOfMemoryError in the Gateway Server in high performance
+      #       installations.
+      #
+      ##
+
+      # SQL error codes which should lead to a persistence layer switch to the filesystem immediately
+      # codes have to be given as comma separated list of integer values
+      # e.g.: for Oracle:
+      #          ORA-12505 - TNS:listener does not currently know of SID given in connect descriptor
+      #          ORA-01017 - Benutzername/Kennwort ungueltig; Anmeldung abgelehnt
+      #          ORA-12519 - TNS:no appropriate service handler found
+      IM.LGW.CHKALG.ABORT.SQL.ERRCODES: "@im.service.archive.lgw.chkalg.abort.sql.errcodes@"
+
+      # SQL status which should lead to a persistence layer switch to the filesystem immediately, when found
+      # in a SQLException. The status strings have to be given as comma separated list
+      # e.g.: for MySQL:
+      #          08S01 - communication link failure - database listener is not reachable
+      IM.LGW.CHKALG.ABORT.SQL.STATUS: "@im.service.archive.lgw.chkalg.abort.sql.status@"
+
+      # This time specifies how many milliseconds will be waited after an alert from the check algorithm
+      # (with following reset of the connection pool), before a possibly next reset attempt will be performed.
+      # In other words, when an alert causes a reset and the next alert will be caught before this time period
+      # is over, the persistence layer will be switched to the filesystem.
+      # Further this time is also used as interval for periodically checkings, whether the database is
+      # accessible again, once switched to the filesystem.
+      # default (if not specified): 300000ms, aka 5min.
+      IM.LGW.CHKALG.PROVE.TIME: 300000
+
+      # time in milliseconds in which 90 percent of all succeeded database write attempts should finish - accounted
+      # over the last <IM.LGW.MaxAsyncSize> measuring points (attempts)
+      # default: ''; when empty (not specified) - this feature is disabled
+      IM.LGW.CHKALG.SUCCESSTIME.90PERC.LIMIT:
+
+      # average time in milliseconds in which all succeeded database write attempts should finish - accounted
+      # over the last <IM.LGW.MaxAsyncSize> measuring points (attempts)
+      # default: ''; when empty (not specified) - this feature is disabled
+      IM.LGW.CHKALG.SUCCESSTIME.AVG.LIMIT:
+
+      # in case of a caught SQLException: time (in milliseconds) accounted over the last <IM.LGW.MaxAsyncSize> measuring
+      # points (here - each time an SQLExceptions has been caught) in which 90 percent of all failed database write
+      # attempts should have been finished (thrown their exception)
+      # default: ''; when empty (not specified) - this feature is disabled
+      IM.LGW.CHKALG.FAILEDTIME.90PERC.LIMIT:
+
+      # in case of a caught SQLException: average time (in milliseconds) accounted over the last <IM.LGW.MaxAsyncSize>
+      # measuring points (here - each time an SQLExceptions has been caught) in which a failed database write attempt
+      # should have been finished (thrown its exception)
+      # default: ''; when empty (not specified) - this feature is disabled
+      IM.LGW.CHKALG.FAILEDTIME.AVG.LIMIT:
+
+      # ratio of succeeded versus failed database write attempts, which should not be exceeded - accounted over the last
+      # <IM.LGW.MaxAsyncSize> measuring points (attempts)
+      # allowed values: 0.01, 0.05, 0.1, 0.5, 0.9, 0.95, 0.99, 1
+      # default: 0.5 (median); when empty (not specified) - this feature is disabled
+      IM.LGW.CHKALG.SUCCESS.FAILED.RATIO: 0.5
+
+      # SQL error codes of low priority database failures
+      # codes have to be given as comma separated list of integer values
+      IM.LGW.CHKALG.RETRY.SQL.ERRCODES:
+
+      # SQL status string of low priority database failures (when found in a SQLException)
+      # The status strings have to be given as comma separated list
+      # e.g.: for MySQL
+      #          40001 - Deadlock found
+      #       for MS SQL Server:
+      #          40001 - Transaction Deadlock
+      IM.LGW.CHKALG.RETRY.SQL.STATUS: "@im.service.archive.lgw.chkalg.retry.sql.status@"
+
+      # Maximum retry count (for detected low priority database failures)
+      IM.LGW.CHKALG.RETRY.MAXCOUNT: 100
+
+      # Wait time between retry (for detected low priority database failures)
+      IM.LGW.CHKALG.RETRY.WAITTIME: 200
+
+
+      ################################################################################
+      # vert.x cluster configuration
+
+      ###########################
+      # general adjustments
+      #
+      vertx.temp.dir: "@vertx.temp.dir@"
+      vertx.keystore.path: "@im.service.archive.vertx.keystore.path@"
+      vertx.keystore.password: "@im.service.archive.vertx.keystore.password@"
+      vertx.truststore.path: "@im.service.archive.vertx.truststore.path@"
+      vertx.truststore.password: "@im.service.archive.vertx.truststore.password@"
+
+      ###########################
+      # in-memory data grid adjustments for the service discovery
+      #
+
+      # select the imdg.
+      # 'hazelcast' or 'infinispan'
+      cluster.imdg.select: "@cluster.imdg@"
+
+      # hazelcast configuration file, defining multicast or dedicated node discovery
+      hazelcast.config: "@im.install.dir@@file.separator@conf@file.separator@hazelcast.archive.xml"
+
+      # infinispan-specific configuration
+      ##########
+      #
+      # infinispan configuration file
+      infinispan.config: "@infinispan.cluster.config.path@"
+      # infinispan transport stack name, available defaults are: "prod_encrypted_tcp_tcpping", "prod_encrypted_udp_multicast"
+      infinispan.transport.stack.name: "@infinispan.cluster.transport.stack.name@"
+      infinispan.cluster.name: "@cluster.group@"
+      infinispan.node.name: archive
+
+      # infinispan host- and port configuration
+      # bind address to use for communication and key exchange
+      # - for special values like "SITE_LOCAL", "NON_LOOPBACK" or "match-interface"
+      #   see: http://www.jgroups.org/manual4/index.html#Transport
+      infinispan.jgroups.bind.address: "@im.service.archive.vertx.host@"
+      # bind port
+      infinispan.jgroups.bind.port: "@im.service.archive.infinispan.cluster.bind.port@"
+      # increment the port up to the given range if the port is blocked - '0' means that
+      # startup fails when the exact "infinispan.jgroups.bind.port" is blocked
+      infinispan.jgroups.bind.port.range: "@im.service.archive.infinispan.cluster.bind.port.range@"
+
+      # infinispan configuration for multicast setups, e.g. "prod_encrypted_udp_multicast"
+      #
+      # multicast address
+      infinispan.jgroups.mcast_addr: "@infinispan.cluster.multicast.group@"
+      # multicast port
+      infinispan.jgroups.mcast_port: "@infinispan.cluster.multicast.port@"
+
+      # infinispan configuration for tcpping setups, e.g. "prod_encrypted_tcp_tcpping"
+      #
+      # list of the cluster nodes hosts/ports
+      # - format: "host1[port1],host2[port2],..."
+      infinispan.jgroups.tcpping.initial_hosts: "@infinispan.cluster.tcpping.hosts@"
+      # allows to probe on additional port for
+      # the given hosts by incrementing the ports up to the
+      # given range
+      infinispan.jgroups.tcpping.port_range: "@infinispan.cluster.tcpping.port.range@"
+
+      # infinispan configuration for key-exchange
+      #
+      # the bind port to use for key exchange
+      infinispan.jgroups.ssl.key.exchange.bind.port: "@im.service.archive.infinispan.cluster.keyexchange.bind.port@"
+      # increment the port up to the given range if the port is blocked - '0' means that
+      # startup fails when the exact "infinispan.jgroups.ssl.key.exchange.bind.port" is blocked
+      infinispan.jgroups.ssl.key.exchange.bind.port.range: "@im.service.archive.infinispan.cluster.keyexchange.bind.port.range@"
+      # enable client certificate auth? (mTLS)
+      infinispan.jgroups.ssl.key.exchange.client.auth.enabled: "@infinispan.cluster.keyexchange.client.auth.enabled@"
+
+
+      ################################################################################
+      # EVENT BUS adjustments
+
+      ###########################
+      # general attributes for the clustered event bus
+      #
+      # SSL/TLS: comma-separated list of allowed cipher suites
+      #vertx.eventbus.enabled.cipher.suites:
+
+      # SSL/TLS: comma-separated list of allowed SSL/TLS protocols
+      # e.g.: "TLSv1", "TLSv1.1", "TLSv1.2"
+      # NOTE:
+      #   SSLv3 is NOT enabled due to POODLE vulnerability http://en.wikipedia.org/wiki/POODLE
+      #   "SSLv2Hello" is NOT enabled since it's disabled by default since JDK7
+      #vertx.eventbus.enabled.secure.transport.protocol:
+
+      #vertx.eventbus.cluster.ping.interval: 20000
+      #vertx.eventbus.cluster.ping.reply.interval: 20000
+      #vertx.eventbus.idle.timeout: 0
+
+      # socket linger timeout (in milliseconds) defines how long a socket should stay
+      # in TIME_WAIT status after it has been closed cleanly ("active close")
+      #vertx.eventbus.so.linger.timeout: -1
+
+      #vertx.eventbus.ssl.handshake.timeout: 10000
+
+      # allowed values: true | false
+      #vertx.eventbus.tcp.keep.alive: false
+
+      # SSL/TLS: use Application-Layer Protocol Negotiation
+      # allowed values: true | false
+      vertx.eventbus.use.alpn: true
+
+      ###########################
+      # attributes for the clustered event bus server
+      #
+      # hostname to use when clustering, (0.0.0.0 meaning listen on all interfaces)
+      vertx.eventbus.host: "@im.service.archive.vertx.host@"
+
+      # cluster port (defaults to 0, meaning a random port)
+      vertx.eventbus.port: "@im.service.archive.vertx.eventbus.port@"
+
+      # public hostname to use when clustering
+      # (if null, means use the same as vertx.eventbus.host)
+      vertx.eventbus.public.host: "@im.service.archive.vertx.host@"
+
+      # public cluster port, defaults to -1 (the same as vertx.eventbus.port)
+      vertx.eventbus.public.port: "@im.service.archive.vertx.eventbus.public.port@"
+
+      # SSL/TLS: defines whether client auth is required
+      # allowed values are:
+      #   NONE
+      #      No client authentication is requested or required.
+      #   REQUEST
+      #      Accept authentication if presented by client. If this option is set
+      #      and the client chooses not to provide authentication information about
+      #      itself, the negotiations will continue.
+      #   REQUIRED
+      #      Require client to present authentication, if not presented then
+      #      negotiations will be declined.
+      vertx.eventbus.client.auth: "@im.service.archive.vertx.eventbus.client.auth@"
+
+      # If you're creating a lot of connections to a Vert.x server in a short period
+      # of time, you may need to increase the accept backlog value in order to avoid
+      # the TCP accept queue getting full.
+      # Default is 1024
+      # vertx.eventbus.accept.backlog: 10000
+
+      # Each TCP connection allocates memory for its buffer, so to support many
+      # connections in limited RAM you may need to reduce the TCP buffer size.
+      #vertx.eventbus.receive.buffer.size: 4096
+      #vertx.eventbus.send.buffer.size: 4096
+
+      ###########################
+      # attributes for the clustered event bus client
+      #
+      #vertx.eventbus.connect.timeout: 60000
+      #vertx.eventbus.reconnect.attempts: 0
+      #vertx.eventbus.reconnect.interval: 1000
+
+      # defines whether to trust all server certificates or not - true | false
+      vertx.eventbus.trust.all.servers: "@im.service.archive.vertx.eventbus.trust.all.servers@"
+
+
+      ################################################################################
+      # REST-API general adjustments
+
+      vertx.http.port: "@im.service.archive.vertx.http.port@"
+      vertx.http.host: "@im.service.archive.vertx.host@"
+      vertx.http.verticle.instances: 4
+
+      # Interval (in seconds) when the dependencies of this service will be checked with a ping
+      # If empty or not a valid number, the dependency ping will be disabled
+      vertx.rest.dependency.ping.interval: 5
+
+      # SSL/TLS: comma-separated list of allowed SSL/TLS protocols
+      # e.g.: "TLSv1", "TLSv1.1", "TLSv1.2"
+      # NOTE:
+      #   SSLv3 is NOT enabled due to POODLE vulnerability http://en.wikipedia.org/wiki/POODLE
+      #   "SSLv2Hello" is NOT enabled since it's disabled by default since JDK7
+      #vertx.http.enabled.secure.transport.protocol:
+
+      #vertx.http.idle.timeout: 0
+
+      # socket linger timeout (in milliseconds) defines how long a socket should stay
+      # in TIME_WAIT status after it has been closed cleanly ("active close")
+      #vertx.http.so.linger.timeout: -1
+
+      #vertx.http.ssl.handshake.timeout: 10000
+
+      # allowed values: true | false
+      #vertx.http.tcp.keep.alive: false
+
+      # SSL/TLS: use Application-Layer Protocol Negotiation
+      # allowed values: true | false
+      vertx.http.use.alpn: true
+
+      # the maximum HTTP chunk size a server request handler will receive / in bytes
+      #vertx.http.max.chunk.size: 8192
+
+      # initial buffer size for HttpObjectDecoder in bytes
+      #vertx.http.decoder.initial.buffer.size: 128
+
+      # max length of all headers (http/1.1)
+      # Note: cluster-internal communication is http/2
+      #vertx.http.max.header.size: 8192
+
+      ###########################
+      # attributes for the cluster-internal http server
+      #
+      # If you're creating a lot of connections to a Vert.x server in a short period
+      # of time, you may need to increase the accept backlog value in order to avoid
+      # the TCP accept queue getting full.
+      # Default is 1024
+      # vertx.http.accept.backlog: 10000
+
+      # SSL/TLS: defines whether client auth is required
+      # allowed values are:
+      #   NONE
+      #      No client authentication is requested or required.
+      #   REQUEST
+      #      Accept authentication if presented by client. If this option is set
+      #      and the client chooses not to provide authentication information about
+      #      itself, the negotiations will continue.
+      #   REQUIRED
+      #      Require client to present authentication, if not presented then
+      #      negotiations will be declined.
+      vertx.http.client.auth: "@im.service.archive.vertx.http.client.auth@"
+
+      ###########################
+      # attributes for the http clients
+      #
+      # defines whether to trust all server certificates or not - true | false
+      vertx.http.trust.all.servers: "@im.service.archive.vertx.http.trust.all.servers@"
+
+      # keep alive timeout for HTTP/2 connections in seconds
+      # default is 60 seconds
+      # This value determines how long a connection remains unused in the pool
+      # before being evicted and closed. A negative value disables the keep alive
+      # feature.
+      #vertx.http.keep.alive.timeout: 60
+
+      # connection timeout in milliseconds
+      #vertx.http.connect.timeout: 60000
+
+      ###########################
+      # REST-API load balancer adjustments
+      #
+      # defines how many times the load balancer should try to find a suitable node
+      # for a request before giving up
+      vertx.executor.pick.effort: 5
+
+      # defines how many times the load balancer should retry a failed request before
+      # giving up
+      vertx.executor.send.retries: 3
+
+      # delay before the first retry attempt (in milliseconds)
+      vertx.executor.send.backoff.first: 500
+
+      # maximum delay before any retry attempt (in milliseconds)
+      vertx.executor.send.backoff.max: 15000
+
+      # jitter factor for exponential backoffs that adds randomness to each retry.
+      # This can be helpful in reducing cascading failures due to retry-storms.
+      # Defaults to 0.5 (a jitter of at most 50% of the computed delay).
+      vertx.executor.send.jitter: 0.5
+
+      ###########################
+      # REST-API circuit breaker adjustments
+      #
+      # threshold when a node should be locked and will no longer receive requests.
+      # The default value applies if 15 of 20 requests failed.
+      vertx.executor.circuit.failure.threshold: 15
+      vertx.executor.circuit.failure.executions: 20
+
+      # threshold when a locked node should be unlocked and will receive requests again.
+      # The default value applies if 6 of 10 requests succeeded.
+      vertx.executor.circuit.success.threshold: 6
+      vertx.executor.circuit.success.executions: 10
+
+      # delay (in milliseconds) to wait before trying requests on a locked node.
+      # Default is 1min.
+      vertx.executor.circuit.delay: 60000
+
+      ###########################
+      # REST-API request backup adjustments
+      #
+      # the backup strategy if all retry attempts have been exhausted.
+      # Default is file system backup.
+      vertx.executor.backup: com.tsystems.interfaceManager.service.util.loadbalance.backup.file.VertxFilesystemBackupStrategy
+
+      # directory where the backup files will be written to.
+      vertx.executor.backup.file.directory: "@im.install.dir@@file.separator@backup"
+
+      # maximum file number in a backup directory before creating a new sub-directory
+      vertx.executor.backup.file.directory.limit: 10000
+
+      # delay (in milliseconds) between restore cycles
+      vertx.executor.backup.file.restore.delay: 15000
+
+      ###########################
+      # Metrics configuration
+
+      # interval (in seconds) in which the current memory usage will be written to a log file. "-1" to disable.
+      logger.memory.interval: 60
+
+      # Enable|Disable all metrics. If set to false, the remaining metric options will have no effect, as all metrics will be disabled.
+      metrics.enabled: "@metrics.enabled@"
+
+      # Enable|Disable garbage collection metrics
+      metrics.gc.enabled: "@metrics.gc.enabled@"
+
+      # Enable|Disable memory metrics
+      metrics.memory.enabled: "@metrics.memory.enabled@"
+
+      # Enable|Disable cpu metrics
+      metrics.cpu.enabled: "@metrics.cpu.enabled@"
+
+      # Enable|Disable thread metrics
+      metrics.thread.enabled: "@metrics.thread.enabled@"
+
+      # Enable|Disable vert.x metrics
+      metrics.vertx.enabled: "@metrics.vertx.enabled@"
+
+      # Enable (true) or Disable (false) the Prometheus Scraping Endpoint
+      metrics.prometheus.enabled: "@metrics.prometheus.enabled@"
+
+      # Set if meter descriptions should be sent to Prometheus.
+      # Turn this off to minimize the amount of data sent on each scrape.
+      metrics.prometheus.descriptions: "@metrics.prometheus.descriptions@"
+
+      # The step size to use in computing windowed statistics like max. The default is 1 minute.
+      # To get the most out of these statistics, align the step interval to be close to your scrape interval.
+      metrics.prometheus.step: "@metrics.prometheus.step@"
+      
+
+
+

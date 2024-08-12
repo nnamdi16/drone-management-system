@@ -1,6 +1,6 @@
 package com.nnamdi.dronemanagementapp.controller;
 
-import com.nnamdi.dronemanagementapp.dto.ConfigurationDto;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.nnamdi.dronemanagementapp.dto.DroneDto;
 import com.nnamdi.dronemanagementapp.dto.Response;
 import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 import static com.nnamdi.dronemanagementapp.controller.BaseApiController.BASE_API_PATH;
 import static com.nnamdi.dronemanagementapp.controller.BaseApiController.DRONE;
@@ -42,8 +44,8 @@ public class DroneController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/config")
-    public ResponseEntity<Response<ConfigurationDto>> getConfig() {
-        Response<ConfigurationDto> response = responseUtil.getSuccessResponse(droneService.getConfig());
+    public ResponseEntity<Response<JsonNode>> getConfig() throws IOException {
+        Response<JsonNode> response = responseUtil.getSuccessResponse(droneService.readFilesContent());
         return ResponseEntity.ok(response);
     }
 

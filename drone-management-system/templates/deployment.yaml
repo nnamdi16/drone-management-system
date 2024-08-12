@@ -16,6 +16,7 @@ spec:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -33,60 +34,11 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
+
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: SPRING_DATASOURCE_URL
-              valueFrom:
-                configMapKeyRef:
-                  key: spring.datasource.url
-                  name: {{ include "drone-management-system.fullname" . }}-config
-
-            - name: SPRING_DATASOURCE_USERNAME
-              valueFrom:
-                configMapKeyRef:
-                  key: spring.datasource.username
-                  name: {{ include "drone-management-system.fullname" . }}-config
-
-            - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                configMapKeyRef:
-                  key: spring.datasource.password
-                  name: {{ include "drone-management-system.fullname" . }}-config
-
-            - name: VERTX_TEMP_DIR
-              valueFrom:
-                configMapKeyRef:
-                  key: vertx.temp.dir
-                  name: {{ include "drone-management-system.fullname" . }}-config
-
-            - name: VERTX_KEYSTORE_PATH
-              valueFrom:
-                configMapKeyRef:
-                  key: vertx.keystore.path
-                  name: {{ include "drone-management-system.fullname" . }}-config
-
-            - name: VERTX_KEYSTORE_PASSWORD
-              valueFrom:
-                configMapKeyRef:
-                  key: vertx.keystore.path
-                  name: {{ include "drone-management-system.fullname" . }}-config
-
-
-            - name: VERTX_TRUSTSTORE_PATH
-              valueFrom:
-                configMapKeyRef:
-                  key: vertx.truststore.path
-                  name: {{ include "drone-management-system.fullname" . }}-config
-
-            - name: VERTX_TRUSTSTORE_PASSWORD
-              valueFrom:
-                configMapKeyRef:
-                  key: vertx.truststore.password
-                  name: {{ include "drone-management-system.fullname" . }}-config
-
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -101,10 +53,14 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.volumes }}
       volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        - name: config-volume
+          projected:
+            sources:
+              {{- range .Values.configMaps}}
+              - configMap:
+                  name: {{ .name}}
+              {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

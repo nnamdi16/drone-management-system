@@ -1,10 +1,12 @@
 package com.nnamdi.dronemanagementapp.service;
 
-import com.nnamdi.dronemanagementapp.dto.ConfigurationDto;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.nnamdi.dronemanagementapp.dto.DroneDto;
 import com.nnamdi.dronemanagementapp.request.RegisterDroneDto;
 import com.nnamdi.dronemanagementapp.request.UpdateDronePositionDto;
 import org.springframework.data.domain.PageImpl;
+
+import java.io.IOException;
 
 
 /**
@@ -19,5 +21,5 @@ public interface DroneService {
 
     PageImpl<DroneDto> getDrones(int page, int limit);
 
-    ConfigurationDto getConfig();
+    JsonNode readFilesContent () throws IOException;
 }

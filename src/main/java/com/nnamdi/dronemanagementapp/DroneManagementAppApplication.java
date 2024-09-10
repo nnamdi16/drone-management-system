@@ -19,11 +19,11 @@ public class DroneManagementAppApplication {
         SpringApplication app = new SpringApplication(DroneManagementAppApplication.class);
         app.addInitializers(applicationContext -> {
             ConfigurableEnvironment environment = applicationContext.getEnvironment();
-            Path path = Paths.get("config/service.auth.cfg");
+            Path path = Paths.get("config/service-auth-cfg");
             try {
                 Properties properties = new Properties();
                 properties.load(Files.newInputStream(path));
-//                System.out.println(properties);
+                System.out.println(properties);
                 PropertiesPropertySource propertySource = new PropertiesPropertySource("application.properties", properties);
                 environment.getPropertySources().addLast(propertySource);
             } catch (IOException e) {

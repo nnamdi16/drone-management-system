@@ -1,0 +1,17 @@
+{{- range .Values.configMaps}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .name }}
+  labels:
+    app: {{ $.Chart.Name }}
+    release: {{ $.Release.Name }}
+data:
+  {{ .filename }}: |-
+    {{- range $key, $value := .properties }}
+    {{ $key }} = {{ $value }}
+    {{- end }}
+---
+{{- end}}
+
+

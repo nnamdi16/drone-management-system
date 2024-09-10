@@ -33,38 +33,34 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        {{- range .Values.containers}}
-        - name: {{ .name }}
+        - name: {{ .Chart.Name }}
+
           securityContext:
-            {{- toYaml $.Values.securityContext | nindent 12 }}
-          image: "{{ .image }}:{{ .tag | default $.Chart.AppVersion }}"
-          imagePullPolicy: {{ .pullPolicy }}
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            {{- range .ports}}
-            - name: {{.name}}
-              containerPort: {{ .port }}
-              protocol: {{.protocol}}
-            {{- end}}
-
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
-            {{- toYaml $.Values.resources | nindent 12 }}
-
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.volumeMounts }}
           volumeMounts:
-            {{- range .volumeMounts}}
-            - name: {{ .name}}
-              mountPath: {{ .path}}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- end}}
       volumes:
-        {{- range .Values.volumes}}
-        - name: {{ .name}}
+        - name: config-volume
           projected:
             sources:
-              {{- range .configMaps}}
+              {{- range .Values.configMaps}}
               - configMap:
-                  name: {{ .}}
-              {{- end}}
-        {{- end}}
+                  name: {{ .name}}
+              {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

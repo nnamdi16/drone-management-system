@@ -1,0 +1,13 @@
+environment:
+  name: dev
+  replicaCount: 1
+  configMap:
+    name: service-auth-config-dev
+    filename: service-auth-config
+    properties:
+      spring.datasource.url: jdbc:postgresql://postgresql:5432/drone-management-systemssssssss
+      spring.datasource.username: postgres
+      spring.datasource.password: postgres
+      project.name: Drone Management System Dev Environment
+      project.description: Drone Management System REST API DEV Environment
+      project.version: 1.0-dev

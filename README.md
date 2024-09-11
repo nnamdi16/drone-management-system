@@ -70,7 +70,7 @@ kind get clusters
 
 - If your cluster is not listed, you need to create or start it:
 ```bash
-kind create clusters
+kind create cluster --name kind
 ```
 
 - Check the current context and ensure it is set to the Kind cluster:
@@ -84,6 +84,12 @@ If necessary, switch to the correct context:
 
 ```bash
 kubectl config use-context kind-kind
+```
+
+To verify nodes in the cluster:
+
+```bash
+kubectl get nodes
 ```
 
 - Deploy the Kubernetes Dashboard
@@ -125,6 +131,8 @@ helm install drone-management-system ./drone-management-system
 - To check the status of the helm release
 ```bash
 helm status drone-management-system 
+
+```
 
 - To upgrade the existing helm release
 ```bash

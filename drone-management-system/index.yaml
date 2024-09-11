@@ -13,5 +13,5 @@ entries:
       name: drone-management-system
       type: application
       urls:
-        - https://github.com/nnamdi16/drone-management-system/drone-management-system-0.1.0.tgz
+        - https://github.com/nnamdi16/drone-management-system/releases/download/0.3.0-helm/drone-management-system-0.1.0.tgz
 generated: "2024-09-11T09:39:59.72726+02:00"

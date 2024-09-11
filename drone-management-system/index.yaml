@@ -1,0 +1,17 @@
+apiVersion: v1
+entries:
+  drone-management-system:
+    - apiVersion: v2
+      appVersion: v0.16.1
+      created: "2024-09-11T09:39:59.72726+02:00"
+      description: A Helm chart for deploying drone-management-application.
+      digest: 68a3bc8e21d3b067e0127abf8dd0f544211509047e6a2e99e89563766bc05a55
+      maintainers:
+        - email: nwabuokeinnamdi@gmail.com
+          name: nnamdi16
+          url: https://github.com/nnamdi16
+      name: drone-management-system
+      type: application
+      urls:
+        - https://github.com/nnamdi16/drone-management-system/releases/download/0.3.0-helm/drone-management-system-0.1.0.tgz
+generated: "2024-09-11T09:39:59.72726+02:00"
